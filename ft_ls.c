@@ -38,6 +38,8 @@ extern int g_opt_reverse;
 
 extern int g_opt_time;
 
+extern t_list *g_paths;
+
 extern const char *g_prog;
 
 /* ft_ls-getopt.c */
@@ -49,10 +51,21 @@ static int ft_getopt_version(void);
 extern int ft_getopt(int, char **);
 
 int main(int ac, char **av) {
+    /* process command-line arguments... */
     int getopt = ft_getopt(ac, av);
     if (getopt != 0) {
         return (getopt);
     }
+
+    /* set default starting path if needed... */
+    if (!g_paths || !ft_lstsize(g_paths)) {
+        g_paths = ft_lstnew(ft_strdup("."));
+        if (!g_paths) {
+            return (1);
+        }
+    }
+    
+    ft_lstclear(&g_paths, free), g_paths = 0;
     return (0);
 }
 
@@ -122,7 +135,14 @@ extern int ft_getopt(int ac, char **av) {
         }
 
         /* process files... */
-        else { /* ... */ }
+        else {
+            t_list *path = ft_lstnew(ft_strdup(*av));
+            if (!path) {
+                return (1);
+            }
+
+            ft_lstadd_back(&g_paths, path);
+        }
     }
     return (0);
 }
@@ -156,6 +176,10 @@ static int ft_getopt_help(void) {
     ft_putendl_fd("Report bugs to: https://github.com/itsYakub/42-ft_ls/issues", 1);
     
     /* exit the program... */
+    if (g_paths) {
+        ft_lstclear(&g_paths, free), g_paths = 0;
+    }
+    
     exit(0);
 }
 
@@ -166,29 +190,37 @@ static int ft_getopt_version(void) {
     ft_putendl_fd("Source code available under <https://github.com/itsYakub/42-ft_ls>.", 1);
 
     /* exit the program... */
+    if (g_paths) {
+        ft_lstclear(&g_paths, free), g_paths = 0;
+    }
+    
     exit(0);
 }
 
 /* g_opt_list - output in list format (check: ls -l)
  * */
-int g_opt_list;
+int g_opt_list = 0;
 
 /* g_opt_recursive - recursively enter to subdirectories (check: ls -R)
  * */
-int g_opt_recursive;
+int g_opt_recursive = 0;
 
 /* g_opt_all - output all files and directories (including hidden) (check: ls -a)
  * */
-int g_opt_all;
+int g_opt_all = 0;
 
 /* g_opt_reverse - sort entries in descending alphanumerical order (check: ls -r)
  * */
-int g_opt_reverse;
+int g_opt_reverse = 0;
 
 /* g_opt_time - sort entries by newest first (check: ls -t)
  * */
-int g_opt_time;
+int g_opt_time = 0;
+
+/* g_paths - global linked list of processed paths (default: '.')
+ * */
+t_list *g_paths = 0;
 
 /* g_prog - name of the executable (av[0])
  * */
-const char *g_prog;
+const char *g_prog = 0;
