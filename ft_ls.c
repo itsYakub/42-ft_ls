@@ -42,6 +42,8 @@ extern t_list *g_paths;
 
 extern const char *g_prog;
 
+extern int ft_process_subdirs(const t_list *, const size_t);
+
 /* ft_ls-getopt.c */
 
 static int ft_getopt_help(void);
@@ -64,9 +66,41 @@ int main(int ac, char **av) {
             return (1);
         }
     }
-    
+   
+    ft_process_subdirs(g_paths, 0);
+
     ft_lstclear(&g_paths, free), g_paths = 0;
     return (0);
+}
+
+extern int ft_process_subdirs(const t_list *paths, const size_t depth) {
+    if (!paths) { return (0); }
+
+    /* NOTE:
+     *  This could be helpful while implementing recursive listing
+     *  Could be replaced with "previous working directory" string that we can prepend before dirent->d_name
+     * */
+    (void) depth;
+
+    /* Standard GNU ls iterates over every supplied path to the program
+     * Even if recursion is enabled this still goes from supplied path to supplied path
+     *
+     * By that logic we can simply go from file to file, store the output into string and display it when needed
+     * */
+    for (t_list *path = (t_list *) paths; path; path = path->next) {
+        ft_putendl_fd(path->content, 1);
+
+        DIR *dir = opendir(path->content);
+        if (!dir) { return (0); }
+        for (struct dirent *dirent = readdir(dir); dirent; dirent = readdir(dir)) {
+
+            ft_putendl_fd(dirent->d_name, 1);
+        }
+
+        closedir(dir);
+    }
+
+    return (1);
 }
 
 extern int ft_getopt(int ac, char **av) {
@@ -82,9 +116,9 @@ extern int ft_getopt(int ac, char **av) {
             if (*opt == '-') {
                 opt++;
 
-                if (!ft_strncmp(opt, "recursive", 10)) { g_opt_recursive = 1; }
                 if (!ft_strncmp(opt, "all", 4))        { g_opt_all = 1;       }
                 if (!ft_strncmp(opt, "reverse", 8))    { g_opt_reverse = 1;   }
+                if (!ft_strncmp(opt, "recursive", 10)) { g_opt_recursive = 1; }
                 
                 else if (!ft_strncmp(opt, "help", 5)) {
                     ft_getopt_help();
@@ -111,11 +145,11 @@ extern int ft_getopt(int ac, char **av) {
             else {
                 do {
                     switch (*opt) {
-                        case ('l'): { g_opt_list = 1;      } break;
-                        case ('R'): { g_opt_recursive = 1; } break;
                         case ('a'): { g_opt_all = 1;       } break;
-                        case ('r'): { g_opt_reverse = 1;   } break;
+                        case ('l'): { g_opt_list = 1;      } break;
                         case ('t'): { g_opt_time = 1;      } break;
+                        case ('r'): { g_opt_reverse = 1;   } break;
+                        case ('R'): { g_opt_recursive = 1; } break;
 
                         default: {
                             ft_putstr_fd(g_prog, 1);
