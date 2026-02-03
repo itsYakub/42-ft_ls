@@ -42,7 +42,15 @@ extern t_list *g_paths;
 
 extern const char *g_prog;
 
-extern int ft_process_subdirs(const t_list *, const size_t);
+/* ft_ls-utils.c */
+
+extern int ft_strcmp(const char *, const char *);
+
+extern char *ft_strjoin_free(char *, const char *);
+
+/* ft_ls-process.c */
+
+extern char *ft_process_subdirs(const t_list *, const size_t);
 
 /* ft_ls-getopt.c */
 
@@ -53,27 +61,60 @@ static int ft_getopt_version(void);
 extern int ft_getopt(int, char **);
 
 int main(int ac, char **av) {
+    int exitcode = 0;
+
     /* process command-line arguments... */
     int getopt = ft_getopt(ac, av);
     if (getopt != 0) {
-        return (getopt);
+        exitcode = getopt; goto main_exit;
     }
 
     /* set default starting path if needed... */
     if (!g_paths || !ft_lstsize(g_paths)) {
         g_paths = ft_lstnew(ft_strdup("."));
         if (!g_paths) {
-            return (1);
+            exitcode = 1; goto main_exit;
         }
     }
    
-    ft_process_subdirs(g_paths, 0);
+    char *output = ft_process_subdirs(g_paths, 0);
+    if (!output) {
+        exitcode = 1; goto main_exit;
+    }
 
-    ft_lstclear(&g_paths, free), g_paths = 0;
+    ft_putendl_fd(output, 1);
+    free(output), output = 0;
+
+main_exit:
+
+    if (g_paths) {
+        ft_lstclear(&g_paths, free), g_paths = 0;
+    }
+
+    return (exitcode);
+}
+
+extern int ft_strcmp(const char *s0, const char *s1) {
+    while (*s0 && *s1) {
+        if (*s0 != *s1) { return (*s0 - *s1); }
+
+        s0++;
+        s1++;
+    }
     return (0);
 }
 
-extern int ft_process_subdirs(const t_list *paths, const size_t depth) {
+extern char *ft_strjoin_free(char *dst, const char *src) {
+    char *tmp = ft_strjoin(dst, src);
+    if (!tmp) {
+        return (0);
+    }
+
+    free(dst), dst = tmp;
+    return (tmp);
+}
+
+extern char *ft_process_subdirs(const t_list *paths, const size_t depth) {
     if (!paths) { return (0); }
 
     /* NOTE:
@@ -87,20 +128,26 @@ extern int ft_process_subdirs(const t_list *paths, const size_t depth) {
      *
      * By that logic we can simply go from file to file, store the output into string and display it when needed
      * */
+    char *output = 0;
     for (t_list *path = (t_list *) paths; path; path = path->next) {
         ft_putendl_fd(path->content, 1);
 
+        /* NOTE:
+         *  THeoretically speaking it would be better to store the pointers to the "dirent"-s
+         *  We could then perform easier sorting, etc. Also, recursion would still be valid.
+         * */
         DIR *dir = opendir(path->content);
         if (!dir) { return (0); }
         for (struct dirent *dirent = readdir(dir); dirent; dirent = readdir(dir)) {
-
-            ft_putendl_fd(dirent->d_name, 1);
+            output = ft_strjoin_free(output, dirent->d_name);
+            output = ft_strjoin_free(output, "  ");
         }
 
+        output = ft_strjoin_free(output, "\n");
         closedir(dir);
     }
 
-    return (1);
+    return (output);
 }
 
 extern int ft_getopt(int ac, char **av) {
@@ -116,15 +163,15 @@ extern int ft_getopt(int ac, char **av) {
             if (*opt == '-') {
                 opt++;
 
-                if (!ft_strncmp(opt, "all", 4))        { g_opt_all = 1;       }
-                if (!ft_strncmp(opt, "reverse", 8))    { g_opt_reverse = 1;   }
-                if (!ft_strncmp(opt, "recursive", 10)) { g_opt_recursive = 1; }
+                if (!ft_strcmp(opt, "all"))       { g_opt_all = 1;       }
+                if (!ft_strcmp(opt, "reverse"))   { g_opt_reverse = 1;   }
+                if (!ft_strcmp(opt, "recursive")) { g_opt_recursive = 1; }
                 
-                else if (!ft_strncmp(opt, "help", 5)) {
+                else if (!ft_strcmp(opt, "help")) {
                     ft_getopt_help();
                 }
                 
-                else if (!ft_strncmp(opt, "version", 8)) {
+                else if (!ft_strcmp(opt, "version")) {
                     ft_getopt_version();
                 }
 
