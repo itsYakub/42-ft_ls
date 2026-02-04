@@ -175,32 +175,20 @@ static char *ft_dirent_print(struct dirent **dirents) {
     if (!dirents) { return (0); }
 
     char *output = 0;
-    for (size_t i = 0; dirents[i]; i++) {
-        struct dirent dirent = *dirents[i];
-                
-        /* validate '-a' flag... */
-        if (*dirent.d_name == '.') {
-            if (!g_opt_all) {
-                continue;
-            }
+    /* validate '-l' flag... */
+    if (!g_opt_list) {
+        output = ft_print_vertical(dirents);
+        if (!output) {
+            return (0);
         }
-       
-        /* validate '-l' flag... */
-        if (!g_opt_list) {
-            output = output == 0 ?
-                ft_strdup(dirent.d_name) :
-                ft_strjoin_free(output, dirent.d_name);
-
-            output = ft_strjoin_free(output, "  ");
-        }
-        else {
-            /* formatted list output... */
+    }
+    else {
+        output = ft_print_list(dirents);
+        if (!output) {
+            return (0);
         }
     }
     
-    if (!g_opt_list) {
-        output = ft_strjoin_free(output, "\n");
-    }
     return (output);
 }
 

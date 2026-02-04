@@ -15,6 +15,7 @@ OBJS	= $(SRCS:.c=.o)
 SRCS	= ./ft_ls.c			\
 		  ./ft_ls-utils.c	\
 		  ./ft_ls-getopt.c	\
+		  ./ft_ls-print.c
 
 # ========
 

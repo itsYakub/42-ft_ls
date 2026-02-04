@@ -48,3 +48,40 @@ extern size_t ft_dircnt(const char *path) {
     closedir(dir);
     return (i);
 }
+
+
+extern size_t ft_numlen(long long n, int base) {
+	int	result = 0;
+	while (n != 0) {
+		result++;
+		n /= base;
+	}
+
+	return (result);
+}
+
+
+extern char *ft_utoa(unsigned long long n) {
+    const char base[] = "0123456789";
+
+    /* length of the number in base16... */
+    size_t n_l = ft_numlen(n, 10);
+
+    /* output string... */
+    char *output = ft_calloc(n_l + 1, sizeof(char));
+    if (!output) { return (0); }
+
+    /* append characters to array... */
+    for (size_t i = 0; n; i++, n /= 10) {
+        output[i] = base[n % 10];
+    }
+
+    /* reverse the array... */
+    for (size_t i = 0; i < n_l / 2; i++) {
+        char tmp = output[i];
+        output[i] = output[n_l - 1 - i];
+        output[n_l - 1 - i] = tmp;
+    }
+
+    return (output);
+}
