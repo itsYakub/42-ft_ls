@@ -35,12 +35,22 @@ extern t_list *g_paths;
 
 extern const char *g_prog;
 
+/* ./ft_ls.c */
+
+extern char *ft_process_subdirs(const char *);
+
 /* ./ft_ls-utils.c */
 
 extern int ft_strcmp(const char *, const char *);
 
 
+extern int ft_strendswith(const char *, int);
+
+
 extern char *ft_strjoin_free(char *, const char *);
+
+
+extern size_t ft_dircnt(const char *);
 
 /* ./ft_ls-getopt.c */
 

@@ -9,8 +9,6 @@
  *      > [ ] -t: sort by time, newest first; see --time (time/date format with -l; see TIME_STYLE below)
  * */
 
-extern char *ft_process_subdirs(const t_list *, const size_t);
-
 int main(int ac, char **av) {
     int exitcode = 0;
 
@@ -27,57 +25,111 @@ int main(int ac, char **av) {
             exitcode = 1; goto main_exit;
         }
     }
-   
-    char *output = ft_process_subdirs(g_paths, 0);
-    if (!output) {
-        exitcode = 1; goto main_exit;
+ 
+    char *output = 0;
+    for (t_list *path = g_paths; path; path = path->next) {
+        char *tmp0 = ft_process_subdirs(path->content);
+        if (!tmp0) {
+            exitcode = 1; goto main_exit;
+        }
+
+        output = output == 0 ?
+            ft_strdup(tmp0) :
+            ft_strjoin_free(output, tmp0);
+
+        free(tmp0), tmp0 = 0;
     }
 
-    ft_putendl_fd(output, 1);
-    free(output), output = 0;
+    ft_putstr_fd(output, 1);
 
 main_exit:
 
-    if (g_paths) {
-        ft_lstclear(&g_paths, free), g_paths = 0;
-    }
+    if (output)  { free(output), output = 0; }
+    if (g_paths) { ft_lstclear(&g_paths, free), g_paths = 0; }
 
     return (exitcode);
 }
 
 
-extern char *ft_process_subdirs(const t_list *paths, const size_t depth) {
-    if (!paths) { return (0); }
+extern char *ft_process_subdirs(const char *path) {
+    if (!path) { return (0); }
 
-    /* NOTE:
-     *  This could be helpful while implementing recursive listing
-     *  Could be replaced with "previous working directory" string that we can prepend before dirent->d_name
-     * */
-    (void) depth;
+    /* 1. allocate an array for all directory entries... */
+    size_t dirndx = 0;
+    size_t dircnt = ft_dircnt(path);
+    struct dirent **dirents = calloc(dircnt + 1, sizeof(struct dirent *));
+    if (!dirents) {
+        return (0);
+    }
 
-    /* Standard GNU ls iterates over every supplied path to the program
-     * Even if recursion is enabled this still goes from supplied path to supplied path
-     *
-     * By that logic we can simply go from file to file, store the output into string and display it when needed
-     * */
-    char *output = 0;
-    for (t_list *path = (t_list *) paths; path; path = path->next) {
-        ft_putendl_fd(path->content, 1);
-
-        /* NOTE:
-         *  THeoretically speaking it would be better to store the pointers to the "dirent"-s
-         *  We could then perform easier sorting, etc. Also, recursion would still be valid.
-         * */
-        DIR *dir = opendir(path->content);
-        if (!dir) { return (0); }
-        for (struct dirent *dirent = readdir(dir); dirent; dirent = readdir(dir)) {
-            output = ft_strjoin_free(output, dirent->d_name);
-            output = ft_strjoin_free(output, "  ");
+        /* 2. open directory on path 'path->content'... */
+        DIR *dir = opendir(path);
+        if (!dir) {
+            free(dirents); return (0);
         }
 
-        output = ft_strjoin_free(output, "\n");
-        closedir(dir);
-    }
+            /* 3. extract every directory entry to dirents... */
+            for (struct dirent *dirent = readdir(dir); dirent; dirent = readdir(dir)) {
+                dirents[dirndx++] = dirent;
+            }
+
+                /* 4. process directory entries... */
+                char *output = 0;
+
+                /* 4.1. insert every name to output string */
+                for (size_t i = 0; i < dircnt; i++) {
+                    struct dirent dirent = *dirents[i];
+                    
+                    output = output == 0 ?
+                        ft_strdup(dirent.d_name) :
+                        ft_strjoin_free(output, dirent.d_name);
+
+                    output = ft_strjoin_free(output, "\n");
+                }
+
+                /* 4.2. process subdirectories recursively... */
+                for (size_t i = 0; i < dircnt; i++) {
+                    struct dirent dirent = *dirents[i];
+
+                    /* avoid "cwd" and "pwd" dirents... */
+                    if (!ft_strcmp(dirent.d_name, ".") ||
+                        !ft_strcmp(dirent.d_name, "..")
+                    ) {
+                        continue;
+                    }
+
+                    if (dirent.d_type == DT_DIR) {
+                        /* create sub-path... */
+                        char *subpath = 0;
+
+                        /* ...also, check if supplied path ends with '/'; if not, append it first... */
+                        if (!ft_strendswith(path, '/')) {
+                            subpath = ft_strjoin(path, "/");
+                            subpath = ft_strjoin_free(subpath, dirent.d_name);
+                        }
+                        else {
+                            subpath = ft_strjoin(path, dirent.d_name);
+                        }
+
+                        char *tmp0 = ft_process_subdirs(subpath);
+                        if (!tmp0) {
+                            free(subpath), subpath = 0;
+                            continue;
+                        }
+
+                        output = ft_strjoin_free(output, "\n");
+                        output = ft_strjoin_free(output, subpath);
+                        output = ft_strjoin_free(output, ":\n");
+                        output = ft_strjoin_free(output, tmp0);
+                        
+                        free(subpath), subpath = 0;
+                        free(tmp0), tmp0 = 0;
+                    }
+                }
+
+    /* 5. cleanup... */
+    closedir(dir);
+    free(dirents);
 
     return (output);
 }
