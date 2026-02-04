@@ -12,6 +12,7 @@
  *      > top-to-bottom
  *      > based on length on single line + length of tty line, probably
  *  - [ ] replace bubble sort with quick sort (cmon man)
+ *  - [ ] fix all potential memory leaks
  * */
 
 static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
