@@ -3,10 +3,15 @@
 /*  ft_ls:
  *  - required flags:
  *      > [ ] -l: use a long listing format
- *      > [ ] -R: list subdirectories recursively
- *      > [ ] -a: do not ignore entries starting with .
- *      > [ ] -r: reverse order while sorting
- *      > [ ] -t: sort by time, newest first; see --time (time/date format with -l; see TIME_STYLE below)
+ *      > [X] -R: list subdirectories recursively
+ *      > [X] -a: do not ignore entries starting with .
+ *      > [X] -r: reverse order while sorting
+ *      > [X] -t: sort by time, newest first; see --time (time/date format with -l; see TIME_STYLE below)
+ *  - [ ] stylized formatting for regular output (check how ls libft/ behave)"
+ *      > columns
+ *      > top-to-bottom
+ *      > based on length on single line + length of tty line, probably
+ *  - [ ] replace bubble sort with quick sort (cmon man)
  * */
 
 static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
