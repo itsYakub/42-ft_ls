@@ -46,7 +46,8 @@ SRC_B = \
 	ft_lstlast_bonus.c \
 	ft_lstmap_bonus.c \
 	ft_lstnew_bonus.c \
-	ft_lstsize_bonus.c
+	ft_lstsize_bonus.c \
+	ft_lstadd_at_bonus.c
 
 OBJ_M = $(SRC_M:.c=.o)
 OBJ_B = $(SRC_B:.c=.o)

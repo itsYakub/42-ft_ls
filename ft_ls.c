@@ -13,6 +13,7 @@
  *      > based on length on single line + length of tty line, probably
  *  - [ ] replace bubble sort with quick sort (cmon man)
  *  - [ ] fix all potential memory leaks
+ *  - [ ] recursive list should append new list object right next to the current object, not to the back
  * */
 
 static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
@@ -21,7 +22,7 @@ static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
 static char *ft_dirent_print(struct dirent **);
 
 
-static char *ft_dirent_recursive_enter(struct dirent **, const char *);
+static int ft_dirent_recursive_enter(struct dirent **, const char *);
 
 
 /* ft_dirent_comparea - compare in ascending order (alphanum) */
@@ -56,26 +57,31 @@ int main(int ac, char **av) {
             exitcode = 1; goto main_exit;
         }
     }
- 
-    char *output = 0;
+
     for (t_list *path = g_paths; path; path = path->next) {
-        char *tmp0 = ft_process_subdirs(path->content);
-        if (!tmp0) {
+        char *output = ft_process_subdirs(path->content);
+        if (!output) {
             exitcode = 1; goto main_exit;
         }
 
-        output = output == 0 ?
-            ft_strdup(tmp0) :
-            ft_strjoin_free(output, tmp0);
+        /* we need to recalculate size each iteration (recursive flag can change the g_paths length)... */
+        size_t lstsize = ft_lstsize(g_paths);
+        if (lstsize > 1) {
+            /* put '\n' between each entry but not before the initial 'path'... */
+            if (path != g_paths) {
+                ft_putchar_fd(10, 1);
+            }
 
-        free(tmp0), tmp0 = 0;
+            ft_putstr_fd(path->content, 1);
+            ft_putendl_fd(":", 1);
+        }
+        ft_putstr_fd(output, 1);
+        free(output), output = 0;
     }
 
-    ft_putstr_fd(output, 1);
 
 main_exit:
 
-    if (output)  { free(output), output = 0; }
     if (g_paths) { ft_lstclear(&g_paths, free), g_paths = 0; }
 
     return (exitcode);
@@ -121,12 +127,7 @@ extern char *ft_process_subdirs(const char *path) {
 
     /* validate '-R' flag... */
     if (g_opt_recursive) {
-        char *tmp0 = ft_dirent_recursive_enter(dirents, path);
-        if (tmp0) {
-            output = ft_strjoin_free(output, "\n");
-            output = ft_strjoin_free(output, tmp0);
-            free(tmp0), tmp0 = 0;
-        }
+        ft_dirent_recursive_enter(dirents, path);
     }
 
     /* 5. cleanup... */
@@ -194,10 +195,9 @@ static char *ft_dirent_print(struct dirent **dirents) {
 }
 
 
-static char *ft_dirent_recursive_enter(struct dirent **dirents, const char *path) {
+static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path) {
     if (!dirents) { return (0); }
 
-    char *output = 0;
     for (size_t i = 0; dirents[i]; i++) {
         struct dirent dirent = *dirents[i];
 
@@ -229,24 +229,17 @@ static char *ft_dirent_recursive_enter(struct dirent **dirents, const char *path
                 subpath = ft_strjoin(path, dirent.d_name);
             }
 
-            char *tmp0 = ft_process_subdirs(subpath);
-            if (!tmp0) {
-                free(subpath), subpath = 0; continue;
+            /* add the new path entry to global paths list... */
+            t_list *entry = ft_lstnew(subpath);
+            if (!entry) {
+                return (1);
             }
 
-            output = output == 0 ?
-                ft_strdup(subpath) :
-                ft_strjoin_free(output, subpath);
-
-            output = ft_strjoin_free(output, ":\n");
-            output = ft_strjoin_free(output, tmp0);
-            
-            free(subpath), subpath = 0;
-            free(tmp0), tmp0 = 0;
+            ft_lstadd_back(&g_paths, entry);
         }
     }
 
-    return (output);
+    return (1);
 }
 
 
