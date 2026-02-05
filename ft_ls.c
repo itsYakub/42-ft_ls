@@ -13,7 +13,7 @@
  *      > based on length on single line + length of tty line, probably
  *  - [ ] replace bubble sort with quick sort (cmon man)
  *  - [ ] fix all potential memory leaks
- *  - [ ] recursive list should append new list object right next to the current object, not to the back
+ *  - [X] recursive list should append new list object right next to the current object, not to the back
  * */
 
 static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
@@ -22,7 +22,7 @@ static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
 static char *ft_dirent_print(struct dirent **);
 
 
-static int ft_dirent_recursive_enter(struct dirent **, const char *);
+static int ft_dirent_recursive_enter(struct dirent **, const char *, t_list **);
 
 
 /* ft_dirent_comparea - compare in ascending order (alphanum) */
@@ -59,7 +59,7 @@ int main(int ac, char **av) {
     }
 
     for (t_list *path = g_paths; path; path = path->next) {
-        char *output = ft_process_subdirs(path->content);
+        char *output = ft_process_subdirs(path->content, path);
         if (!output) {
             exitcode = 1; goto main_exit;
         }
@@ -88,7 +88,7 @@ main_exit:
 }
 
 
-extern char *ft_process_subdirs(const char *path) {
+extern char *ft_process_subdirs(const char *path, t_list *list) {
     if (!path) { return (0); }
 
     /* 1. open directory on path 'path->content'... */
@@ -127,7 +127,7 @@ extern char *ft_process_subdirs(const char *path) {
 
     /* validate '-R' flag... */
     if (g_opt_recursive) {
-        ft_dirent_recursive_enter(dirents, path);
+        ft_dirent_recursive_enter(dirents, path, &list);
     }
 
     /* 5. cleanup... */
@@ -195,7 +195,7 @@ static char *ft_dirent_print(struct dirent **dirents) {
 }
 
 
-static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path) {
+static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path, t_list **list) {
     if (!dirents) { return (0); }
 
     for (size_t i = 0; dirents[i]; i++) {
@@ -209,7 +209,6 @@ static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path) 
         }
 
         if (dirent.d_type == DT_DIR) {
-
             /* validate '-a' flag... */
             if (*dirent.d_name == '.') {
                 if (!g_opt_all) {
@@ -235,7 +234,9 @@ static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path) 
                 return (1);
             }
 
-            ft_lstadd_back(&g_paths, entry);
+            entry->next = (*list)->next;
+            (*list)->next = entry;
+            (*list) = (*list)->next;
         }
     }
 

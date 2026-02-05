@@ -37,7 +37,7 @@ extern const char *g_prog;
 
 /* ./ft_ls.c */
 
-extern char *ft_process_subdirs(const char *);
+extern char *ft_process_subdirs(const char *, t_list *);
 
 /* ./ft_ls-utils.c */
 
