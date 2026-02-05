@@ -69,4 +69,8 @@ extern char *ft_print_vertical(struct dirent **);
 
 extern char *ft_print_list(struct dirent **);
 
+/* ./ft_ls-sort.c */
+
+extern struct dirent **ft_dirent_qsort(struct dirent **, const size_t, const size_t, int (*)(struct dirent *, struct dirent *));
+
 #endif /* _ft_ls_h_ */
