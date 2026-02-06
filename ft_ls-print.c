@@ -1,6 +1,31 @@
 #include "./ft_ls.h"
 
-extern int ft_print_column(struct s_file *arr, const size_t size) {
+
+static int ft_print_column(struct s_file *, const size_t);
+
+
+static int ft_print_vertical(struct s_file *, const size_t);
+
+
+static int ft_print_long(struct s_file *, const size_t);
+
+
+extern int ft_print(struct s_file *arr, const size_t size) {
+    if (!arr) { return (0); }
+
+    int status = 0;
+    switch (g_print_mode) {
+        case (PRINT_MODE_COLUMN):   { status = ft_print_column(arr, size);   } break;
+        case (PRINT_MODE_VERTICAL): { status = ft_print_vertical(arr, size); } break;
+        case (PRINT_MODE_LONG):     { status = ft_print_long(arr, size);     } break;
+
+        default: { /* ... */ } break;
+    }
+    
+    return (status);
+}
+
+static int ft_print_column(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
     for (size_t i = 0; i < size; i++) {
@@ -17,7 +42,7 @@ extern int ft_print_column(struct s_file *arr, const size_t size) {
 }
 
 
-extern int ft_print_vertical(struct s_file *arr, const size_t size) {
+static int ft_print_vertical(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
     (void) arr;
@@ -26,7 +51,7 @@ extern int ft_print_vertical(struct s_file *arr, const size_t size) {
 }
 
 
-extern int ft_print_long(struct s_file *arr, const size_t size) {
+static int ft_print_long(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
     (void) arr;

@@ -13,9 +13,11 @@ LDFLAGS	= -L$(LIBFT)
 
 OBJS	= $(SRCS:.c=.o)
 SRCS	= ./ft_ls.c			\
-		  ./ft_ls-utils.c	\
 		  ./ft_ls-getopt.c	\
+		  ./ft_ls-dir.c		\
+		  ./ft_ls-file.c	\
 		  ./ft_ls-sort.c	\
+		  ./ft_ls-utils.c	\
 		  ./ft_ls-print.c
 
 # ========

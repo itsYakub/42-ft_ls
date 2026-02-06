@@ -68,9 +68,13 @@ struct s_file {
 };
 
 
-/* ./ft_ls.c */
+/* ./ft_ls-dir.c */
 
-extern struct s_file *ft_process_dirs(t_list *);
+extern struct s_file *ft_process_d(t_list *);
+
+/* ./ft_ls-file.c */
+
+extern struct s_file *ft_process_f(t_list *);
 
 /* ./ft_ls-utils.c */
 
@@ -97,16 +101,11 @@ extern int ft_getopt(int, char **);
 
 /* ./ft_ls-print.c */
 
-extern int ft_print_column(struct s_file *, const size_t);
+extern int ft_print(struct s_file *, const size_t);
 
-
-extern int ft_print_vertical(struct s_file *, const size_t);
-
-
-extern int ft_print_long(struct s_file *, const size_t);
 
 /* ./ft_ls-sort.c */
 
-extern struct s_file *ft_file_qsort(struct s_file *, const size_t, const size_t, int (*)(struct s_file, struct s_file));
+extern struct s_file *ft_qsort(struct s_file *, const size_t, const size_t, int (*)(struct s_file, struct s_file));
 
 #endif /* _ft_ls_h_ */
