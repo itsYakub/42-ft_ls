@@ -49,8 +49,10 @@ extern int ft_getopt(int ac, char **av) {
             else {
                 do {
                     switch (*opt) {
+                        case ('1'): { g_print_mode = 0;    } break;
+                        case ('C'): { g_print_mode = 1;    } break;
+                        case ('l'): { g_print_mode = 2;    } break;
                         case ('a'): { g_opt_all = 1;       } break;
-                        case ('l'): { g_opt_list = 1;      } break;
                         case ('t'): { g_opt_time = 1;      } break;
                         case ('r'): { g_opt_reverse = 1;   } break;
                         case ('R'): { g_opt_recursive = 1; } break;
@@ -98,10 +100,12 @@ static int ft_getopt_help(void) {
     /* print options... */
     ft_putendl_fd("Mandatory arguments to long options are mandatory for short options too.", 1);
     ft_putendl_fd("  -a, --all                  do not ignore entries starting with .", 1);
+    ft_putendl_fd("  -C                         list entries by columns", 1);
     ft_putendl_fd("  -l                         use a long listing format", 1);
     ft_putendl_fd("  -r, --reverse              reverse order while sorting", 1);
     ft_putendl_fd("  -R, --recursive            list subdirectories recursively", 1);
     ft_putendl_fd("  -t                         sort by time, newest first", 1);
+    ft_putendl_fd("  -1                         list one file per line", 1);
     ft_putendl_fd("      --help        display this help and exit", 1);
     ft_putendl_fd("      --version     output version information and exit", 1);
     

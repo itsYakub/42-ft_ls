@@ -189,12 +189,12 @@ static int ft_file_print(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
     int status = 0;
-    /* validate '-l' flag... */
-    if (!g_opt_list) {
-        status = ft_print_vertical(arr, size);
-    }
-    else {
-        /* ... */
+    switch (g_print_mode) {
+        case (PRINT_MODE_COLUMN):   { status = ft_print_column(arr, size);   } break;
+        case (PRINT_MODE_VERTICAL): { status = ft_print_vertical(arr, size); } break;
+        case (PRINT_MODE_LONG):     { status = ft_print_long(arr, size);     } break;
+
+        default: { /* ... */ } break;
     }
     
     return (status);
@@ -325,10 +325,6 @@ static inline int ft_file_comparedt(struct s_file f0, struct s_file f1) {
 }
 
 
-/* g_opt_list - output in list format (check: ls -l)
- * */
-int g_opt_list = 0;
-
 /* g_opt_recursive - recursively enter to subdirectories (check: ls -R)
  * */
 int g_opt_recursive = 0;
@@ -352,3 +348,5 @@ t_list *g_paths = 0;
 /* g_prog - name of the executable (av[0])
  * */
 const char *g_prog = 0;
+
+enum e_print_mode g_print_mode = PRINT_MODE_VERTICAL;

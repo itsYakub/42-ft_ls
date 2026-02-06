@@ -21,8 +21,6 @@
 #
 # include "./libft/libft.h"
 
-extern int g_opt_list;
-
 extern int g_opt_recursive;
 
 extern int g_opt_all;
@@ -34,6 +32,21 @@ extern int g_opt_time;
 extern t_list *g_paths;
 
 extern const char *g_prog;
+
+
+enum e_print_mode {
+
+    PRINT_MODE_COLUMN   = 0,    /* $ ls --format=single-column */
+    PRINT_MODE_VERTICAL = 1,    /* $ ls --format=vertical */
+    PRINT_MODE_LONG     = 2,    /* $ ls --format=long */
+
+    /* ... */
+
+    PRINT_MODE_COUNT
+
+};
+
+extern enum e_print_mode g_print_mode;
 
 
 struct s_file {
@@ -86,7 +99,13 @@ extern int ft_getopt(int, char **);
 
 /* ./ft_ls-print.c */
 
+extern int ft_print_column(struct s_file *, const size_t);
+
+
 extern int ft_print_vertical(struct s_file *, const size_t);
+
+
+extern int ft_print_long(struct s_file *, const size_t);
 
 /* ./ft_ls-sort.c */
 
