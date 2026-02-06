@@ -18,6 +18,9 @@
  *  - [ ] do we even need memory allocations?
  * */
 
+static char *ft_dirent_process(DIR *, const char *, t_list *);
+
+
 static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
 
 
@@ -93,49 +96,54 @@ main_exit:
 extern char *ft_process_subdirs(const char *path, t_list *list) {
     if (!path) { return (0); }
 
-    /* 1. open directory on path 'path->content'... */
+    char *output = 0;
     DIR *dir = opendir(path);
+    /* process individual files (check: ls ft_ls)... */
     if (!dir) {
+        /* ... */
         return (0);
     }
+    /* process directory entries (check: ls .)... */
+    else {
+        output = ft_dirent_process(dir, path, list);
+        if (!output) {
+            return (0);
+        }
+    }
 
-    /* 2. allocate an array for all directory entries... */
-    size_t dirndx = 0;
+    closedir(dir);
+    return (output);
+}
+
+
+static char *ft_dirent_process(DIR *dir, const char *path, t_list *list) {
     size_t dircnt = ft_dircnt(path);
     struct dirent **dirents = calloc(dircnt + 1, sizeof(struct dirent *));
     if (!dirents) {
-        closedir(dir);
         return (0);
     }
 
-    /* 3. extract every directory entry to dirents... */
     struct dirent *dirent = 0;
-    while ((dirent = readdir(dir))) {
-        dirents[dirndx++] = dirent;
+    for (size_t i = 0; (dirent = readdir(dir)); i++) {
+        dirents[i] = dirent;
     }
     
-    /* 4. process directory entries... */
-
-    /* 4.1. sort entries... */
     dirents = ft_dirent_sort(dirents, dircnt);
     if (!dirents) {
         return (0);
     }
 
-    /* 4.2. insert every name to output string */
     char *output = ft_dirent_print(dirents);
+    if (!output) {
+        free(dirents);
+        return (0);
+    }
 
-    /* 4.3. process subdirectories recursively... */
-
-    /* validate '-R' flag... */
     if (g_opt_recursive) {
         ft_dirent_recursive_enter(dirents, path, &list);
     }
 
-    /* 5. cleanup... */
-    closedir(dir);
     free(dirents);
-
     return (output);
 }
 
