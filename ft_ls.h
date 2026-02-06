@@ -53,10 +53,16 @@ extern char *ft_strjoin_free(char *, const char *);
 extern size_t ft_dircnt(const char *);
 
 
+extern size_t ft_dirent_blkcnt(struct dirent **);
+
+
+extern size_t ft_dirent_fsizmax(struct dirent **);
+
+
 extern size_t ft_numlen(long long, int);
 
 
-extern char *ft_utoa(unsigned long long );
+extern char *ft_utoa(unsigned long long, char [16]);
 
 /* ./ft_ls-getopt.c */
 
@@ -68,6 +74,9 @@ extern char *ft_print_vertical(struct dirent **);
 
 
 extern char *ft_print_list(struct dirent **);
+
+
+extern char *ft_print_entry(struct dirent *);
 
 /* ./ft_ls-sort.c */
 

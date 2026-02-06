@@ -50,6 +50,56 @@ extern size_t ft_dircnt(const char *path) {
 }
 
 
+extern size_t ft_dirent_blkcnt(struct dirent **arr) {
+    if (!arr) { return (0); }
+
+    size_t result = 0;
+    for (size_t i = 0; arr[i]; i++) {
+        struct dirent *dirent = arr[i];
+        /* validate '-a' flag... */
+        if (*dirent->d_name == '.') {
+            if (!g_opt_all) {
+                continue;
+            }
+        }
+
+        struct stat st = { 0 };
+        if (stat(dirent->d_name, &st) == -1) {
+            return (0);
+        }
+
+        result += st.st_blocks;
+    }
+    return (result);
+}
+
+
+extern size_t ft_dirent_fsizmax(struct dirent **arr) {
+    if (!arr) { return (0); }
+
+    size_t result = 0;
+    for (size_t i = 0; arr[i]; i++) {
+        struct dirent *dirent = arr[i];
+        /* validate '-a' flag... */
+        if (*dirent->d_name == '.') {
+            if (!g_opt_all) {
+                continue;
+            }
+        }
+
+        struct stat st = { 0 };
+        if (stat(dirent->d_name, &st) == -1) {
+            return (0);
+        }
+
+        result = (__off_t) result > st.st_size ?
+            result :
+            (size_t) st.st_size;
+    }
+    return (result);
+}
+
+
 extern size_t ft_numlen(long long n, int base) {
 	int	result = 0;
 	while (n != 0) {
@@ -61,15 +111,11 @@ extern size_t ft_numlen(long long n, int base) {
 }
 
 
-extern char *ft_utoa(unsigned long long n) {
+extern char *ft_utoa(unsigned long long n, char output[16]) {
     const char base[] = "0123456789";
 
     /* length of the number in base16... */
     size_t n_l = ft_numlen(n, 10);
-
-    /* output string... */
-    char *output = ft_calloc(n_l + 1, sizeof(char));
-    if (!output) { return (0); }
 
     /* append characters to array... */
     for (size_t i = 0; n; i++, n /= 10) {
