@@ -14,7 +14,7 @@
  *  - [ ] fix the time sorting
  * */
 
-static struct s_file *ft_dirent_process(DIR *, const char *, t_list *);
+static struct s_file *ft_dirent_process(DIR *, const char *);
 
 
 static struct s_file *ft_file_sort(struct s_file *, const size_t);
@@ -93,7 +93,9 @@ main_exit:
 extern struct s_file *ft_process_subdirs(const char *path, t_list *list) {
     if (!path) { return (0); }
 
+    size_t size = 0;
     struct s_file *files = 0;
+
     DIR *dir = opendir(path);
     /* process individual files (check: ls ft_ls)... */
     if (!dir) {
@@ -102,18 +104,28 @@ extern struct s_file *ft_process_subdirs(const char *path, t_list *list) {
     }
     /* process directory entries (check: ls .)... */
     else {
-        files = ft_dirent_process(dir, path, list);
+        size = ft_dircnt(path);
+        files = ft_dirent_process(dir, path);
         if (!files) {
             return (0);
         }
+        closedir(dir);
     }
-    closedir(dir);
+  
+    files = ft_file_sort(files, size);
+    if (!files) {
+        return (0);
+    }
+
+    if (g_opt_recursive) {
+        ft_file_recursive_enter(files, size, path, &list);
+    }
     
     return (files);
 }
 
 
-static struct s_file *ft_dirent_process(DIR *dir, const char *path, t_list *list) {
+static struct s_file *ft_dirent_process(DIR *dir, const char *path) {
     size_t dircnt = ft_dircnt(path);
     struct s_file *files = ft_calloc(dircnt, sizeof(struct s_file));
     if (!files) {
@@ -147,15 +159,6 @@ static struct s_file *ft_dirent_process(DIR *dir, const char *path, t_list *list
         files[i].f_blkcnt = st.st_blocks;
         files[i].f_dev = st.st_dev;
         files[i].f_rdev = st.st_rdev;
-    }
-    
-    files = ft_file_sort(files, dircnt);
-    if (!files) {
-        return (0);
-    }
-
-    if (g_opt_recursive) {
-        ft_file_recursive_enter(files, dircnt, path, &list);
     }
 
     return (files);
