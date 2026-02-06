@@ -73,16 +73,6 @@ extern int ft_getopt(int ac, char **av) {
                 } while (*++opt);
             }
         }
-
-        /* process files... */
-        else {
-            t_list *path = ft_lstnew(ft_strdup(*av));
-            if (!path) {
-                return (1);
-            }
-
-            ft_lstadd_back(&g_paths, path);
-        }
     }
     return (0);
 }

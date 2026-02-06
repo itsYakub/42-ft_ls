@@ -43,74 +43,99 @@ static inline int ft_file_comparedt(struct s_file, struct s_file);
 
 
 int main(int ac, char **av) {
-    int exitcode = 0;
-
     /* process command-line arguments... */
+    
     int getopt = ft_getopt(ac, av);
     if (getopt != 0) {
-        exitcode = getopt; goto main_exit;
+        return (1);
     }
 
-    /* set default starting path if needed... */
-    if (!g_paths || !ft_lstsize(g_paths)) {
-        g_paths = ft_lstnew(ft_strdup("."));
-        if (!g_paths) {
-            exitcode = 1; goto main_exit;
+    /* extract files / directories... */
+    
+    t_list *l_files = 0;
+    t_list *l_dirs  = 0;
+    for (size_t i = 1; i < (size_t) ac; i++) {
+        if (*av[i] == '-') { continue; }
+
+        struct stat st = { 0 };
+        if (stat(av[i], &st) == -1) {
+            return (1);
+        }
+
+        char *path = ft_strdup(av[i]);
+        switch ((st.st_mode & S_IFMT)) {
+            case (S_IFDIR): { ft_lstadd_back(&l_dirs, ft_lstnew(path)); } break;
+            default: {
+                ft_lstadd_back(&l_files, ft_lstnew(path));
+            }
         }
     }
+    
+    /* default case... */
+    if (!l_files && !l_dirs) {
+        l_dirs = ft_lstnew(ft_strdup("."));
+    }
 
-    for (t_list *path = g_paths; path; path = path->next) {
-        struct s_file *files = ft_process_subdirs(path->content, path);
+
+    /* process files... */
+
+    for (t_list *list= l_files; list; list = list->next) {
+        /* skip for now... */
+    }
+    
+    ft_lstclear(&l_files, free);
+    
+    /* process directories... */
+
+    for (t_list *list = l_dirs; list; list = list->next) {
+        struct s_file *files = ft_process_dirs(list);
         if (!files) {
-            exitcode = 1; goto main_exit;
+            ft_lstclear(&l_dirs, free);
+            return (1);
         }
-
-        /* we need to recalculate size each iteration (recursive flag can change the g_paths length)... */
-        size_t lstsize = ft_lstsize(g_paths);
+        
+        const char *path = list->content;
+        size_t lstsize = ft_lstsize(l_dirs);
         if (lstsize > 1) {
-            /* put '\n' between each entry but not before the initial 'path'... */
-            if (path != g_paths) {
+            if (list != l_dirs) {
                 ft_putchar_fd(10, 1);
             }
 
-            ft_putstr_fd(path->content, 1);
+            ft_putstr_fd(path, 1);
             ft_putendl_fd(":", 1);
         }
-        ft_file_print(files, ft_dircnt(path->content));
+
+        size_t filescnt = ft_dircnt(path);
+        ft_file_print(files, filescnt);
         
         free(files), files = 0;
     }
 
 
-main_exit:
+    ft_lstclear(&l_dirs, free);
 
-    if (g_paths) { ft_lstclear(&g_paths, free), g_paths = 0; }
-
-    return (exitcode);
+    return (0);
 }
 
 
-extern struct s_file *ft_process_subdirs(const char *path, t_list *list) {
-    if (!path) { return (0); }
+extern struct s_file *ft_process_dirs(t_list *list) {
+    if (!list) { return (0); }
 
     size_t size = 0;
     struct s_file *files = 0;
 
+    const char *path = list->content;
     DIR *dir = opendir(path);
-    /* process individual files (check: ls ft_ls)... */
     if (!dir) {
-        /* ... */
         return (0);
     }
-    /* process directory entries (check: ls .)... */
-    else {
-        size = ft_dircnt(path);
-        files = ft_dirent_process(dir, path);
-        if (!files) {
-            return (0);
-        }
-        closedir(dir);
+
+    size = ft_dircnt(path);
+    files = ft_dirent_process(dir, path);
+    if (!files) {
+        return (0);
     }
+    closedir(dir);
   
     files = ft_file_sort(files, size);
     if (!files) {

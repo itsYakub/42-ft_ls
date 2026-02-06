@@ -72,7 +72,7 @@ struct s_file {
 
 /* ./ft_ls.c */
 
-extern struct s_file *ft_process_subdirs(const char *, t_list *);
+extern struct s_file *ft_process_dirs(t_list *);
 
 /* ./ft_ls-utils.c */
 
