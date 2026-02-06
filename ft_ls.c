@@ -122,13 +122,21 @@ static struct s_file *ft_dirent_process(DIR *dir, const char *path, t_list *list
 
     struct dirent *dirent = 0;
     for (size_t i = 0; (dirent = readdir(dir)); i++) {
-        ft_strlcpy(files[i].f_name, dirent->d_name, PATH_MAX);
+        /* create sub-path... */
+        char subpath[PATH_MAX + 1] = { 0 };
+        ft_strlcat(subpath, path, PATH_MAX);
+        if (!ft_strendswith(path, '/')) {
+            ft_strlcat(subpath, "/", PATH_MAX);
+        }
+        ft_strlcat(subpath, dirent->d_name, PATH_MAX);
 
         struct stat st = { 0 };
-        if (stat(path, &st) == -1) {
-            return (0);
+        if (stat(subpath, &st) == -1) {
+            perror(files[i].f_name);
+            free(files); return (0);
         }
 
+        ft_strlcat(files[i].f_name, dirent->d_name, PATH_MAX);
         files[i].f_mode = st.st_mode;
         files[i].f_mtime = st.st_mtime;
         files[i].f_ctime = st.st_ctime;
@@ -204,7 +212,8 @@ static int ft_file_recursive_enter(struct s_file *arr, const size_t size, const 
             continue;
         }
 
-        if (S_ISDIR(arr[i].f_mode)) {
+        int mode = arr[i].f_mode & S_IFMT;
+        if (mode == S_IFDIR) {
             /* validate '-a' flag... */
             if (*arr[i].f_name == '.') {
                 if (!g_opt_all) {
@@ -214,17 +223,11 @@ static int ft_file_recursive_enter(struct s_file *arr, const size_t size, const 
 
             /* create sub-path... */
             char subpath[PATH_MAX + 1] = { 0 };
-
-            /* ...also, check if supplied path ends with '/'; if not, append it first... */
+            ft_strlcat(subpath, path, PATH_MAX);
             if (!ft_strendswith(path, '/')) {
-                strlcat(subpath, path, PATH_MAX);
-                strlcat(subpath, "/", PATH_MAX);
-                strlcat(subpath, arr[i].f_name, PATH_MAX);
+                ft_strlcat(subpath, "/", PATH_MAX);
             }
-            else {
-                strlcat(subpath, path, PATH_MAX);
-                strlcat(subpath, arr[i].f_name, PATH_MAX);
-            }
+            ft_strlcat(subpath, arr[i].f_name, PATH_MAX);
 
             /* add the new path entry to global paths list... */
             t_list *entry = ft_lstnew(ft_strdup(subpath));
