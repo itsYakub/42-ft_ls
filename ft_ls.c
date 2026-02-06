@@ -11,11 +11,7 @@
  *      > columns
  *      > top-to-bottom
  *      > based on length on single line + length of tty line, probably
- *  - [X] replace bubble sort with quick sort (cmon man)
- *  - [ ] fix all potential memory leaks
- *  - [X] recursive list should append new list object right next to the current object, not to the back
  *  - [ ] fix the time sorting
- *  - [ ] do we even need memory allocations?
  * */
 
 static char *ft_dirent_process(DIR *, const char *, t_list *);
@@ -306,7 +302,11 @@ static inline int ft_dirent_compareat(struct dirent *d0, struct dirent *d1) {
     if (stat(d1->d_name, &st) == -1) { return (0); }
     size_t t1 = st.st_mtime;
 
-    return (t0 >= t1);
+    if (t0 < t1) { return (1); }
+    else if (t0 > t1) { return (0); }
+    else {
+        return (ft_dirent_comparea(d0, d1));
+    }
 }
 
 
@@ -320,7 +320,11 @@ static inline int ft_dirent_comparedt(struct dirent *d0, struct dirent *d1) {
     if (stat(d1->d_name, &st) == -1) { return (0); }
     size_t t1 = st.st_mtime;
 
-    return (t0 <= t1);
+    if (t0 > t1) { return (1); }
+    else if (t0 < t1) { return (0); }
+    else {
+        return (ft_dirent_compared(d0, d1));
+    }
 }
 
 
