@@ -14,32 +14,32 @@
  *  - [ ] fix the time sorting
  * */
 
-static char *ft_dirent_process(DIR *, const char *, t_list *);
+static struct s_file *ft_dirent_process(DIR *, const char *, t_list *);
 
 
-static struct dirent **ft_dirent_sort(struct dirent **, const size_t);
+static struct s_file *ft_file_sort(struct s_file *, const size_t);
 
 
-static char *ft_dirent_print(struct dirent **);
+static int ft_file_print(struct s_file *, const size_t);
 
 
-static int ft_dirent_recursive_enter(struct dirent **, const char *, t_list **);
+static int ft_file_recursive_enter(struct s_file *, const size_t, const char *, t_list **);
 
 
-/* ft_dirent_comparea - compare in ascending order (alphanum) */
-static inline int ft_dirent_comparea(struct dirent *, struct dirent *);
+/* ft_file_comparea - compare in ascending order (alphanum) */
+static inline int ft_file_comparea(struct s_file, struct s_file);
 
 
-/* ft_dirent_compared - compare in descending order (alphanum) */
-static inline int ft_dirent_compared(struct dirent *, struct dirent *);
+/* ft_file_compared - compare in descending order (alphanum) */
+static inline int ft_file_compared(struct s_file, struct s_file);
 
 
-/* ft_dirent_compareat - compare in ascending order (time) */
-static inline int ft_dirent_compareat(struct dirent *, struct dirent *);
+/* ft_file_compareat - compare in ascending order (time) */
+static inline int ft_file_compareat(struct s_file, struct s_file);
 
 
-/* ft_dirent_comparedt - compare in descending order (time) */
-static inline int ft_dirent_comparedt(struct dirent *, struct dirent *);
+/* ft_file_comparedt - compare in descending order (time) */
+static inline int ft_file_comparedt(struct s_file, struct s_file);
 
 
 int main(int ac, char **av) {
@@ -60,8 +60,8 @@ int main(int ac, char **av) {
     }
 
     for (t_list *path = g_paths; path; path = path->next) {
-        char *output = ft_process_subdirs(path->content, path);
-        if (!output) {
+        struct s_file *files = ft_process_subdirs(path->content, path);
+        if (!files) {
             exitcode = 1; goto main_exit;
         }
 
@@ -76,8 +76,9 @@ int main(int ac, char **av) {
             ft_putstr_fd(path->content, 1);
             ft_putendl_fd(":", 1);
         }
-        ft_putstr_fd(output, 1);
-        free(output), output = 0;
+        ft_file_print(files, ft_dircnt(path->content));
+        
+        free(files), files = 0;
     }
 
 
@@ -89,10 +90,10 @@ main_exit:
 }
 
 
-extern char *ft_process_subdirs(const char *path, t_list *list) {
+extern struct s_file *ft_process_subdirs(const char *path, t_list *list) {
     if (!path) { return (0); }
 
-    char *output = 0;
+    struct s_file *files = 0;
     DIR *dir = opendir(path);
     /* process individual files (check: ls ft_ls)... */
     if (!dir) {
@@ -101,129 +102,132 @@ extern char *ft_process_subdirs(const char *path, t_list *list) {
     }
     /* process directory entries (check: ls .)... */
     else {
-        output = ft_dirent_process(dir, path, list);
-        if (!output) {
+        files = ft_dirent_process(dir, path, list);
+        if (!files) {
             return (0);
         }
     }
-
     closedir(dir);
-    return (output);
+    
+    return (files);
 }
 
 
-static char *ft_dirent_process(DIR *dir, const char *path, t_list *list) {
+static struct s_file *ft_dirent_process(DIR *dir, const char *path, t_list *list) {
     size_t dircnt = ft_dircnt(path);
-    struct dirent **dirents = calloc(dircnt + 1, sizeof(struct dirent *));
-    if (!dirents) {
+    struct s_file *files = ft_calloc(dircnt, sizeof(struct s_file));
+    if (!files) {
         return (0);
     }
 
     struct dirent *dirent = 0;
     for (size_t i = 0; (dirent = readdir(dir)); i++) {
-        dirents[i] = dirent;
+        ft_strlcpy(files[i].f_name, dirent->d_name, PATH_MAX);
+
+        struct stat st = { 0 };
+        if (stat(path, &st) == -1) {
+            return (0);
+        }
+
+        files[i].f_mode = st.st_mode;
+        files[i].f_mtime = st.st_mtime;
+        files[i].f_ctime = st.st_ctime;
+        files[i].f_atime = st.st_atime;
+        files[i].f_uid = st.st_uid;
+        files[i].f_gid = st.st_gid;
+        files[i].f_nlink = st.st_nlink;
+        files[i].f_blkcnt = st.st_blocks;
+        files[i].f_dev = st.st_dev;
+        files[i].f_rdev = st.st_rdev;
     }
     
-    dirents = ft_dirent_sort(dirents, dircnt);
-    if (!dirents) {
-        return (0);
-    }
-
-    char *output = ft_dirent_print(dirents);
-    if (!output) {
-        free(dirents);
+    files = ft_file_sort(files, dircnt);
+    if (!files) {
         return (0);
     }
 
     if (g_opt_recursive) {
-        ft_dirent_recursive_enter(dirents, path, &list);
+        ft_file_recursive_enter(files, dircnt, path, &list);
     }
 
-    free(dirents);
-    return (output);
+    return (files);
 }
 
 
-static struct dirent **ft_dirent_sort(struct dirent **arr, const size_t count) {
+static struct s_file *ft_file_sort(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
-    int (*compare)(struct dirent *, struct dirent *) = 0;
+    int (*compare)(struct s_file, struct s_file) = 0;
     if (g_opt_reverse) {
         if (g_opt_time) {
-            compare = ft_dirent_comparedt;
+            compare = ft_file_comparedt;
         }
         else {
-            compare = ft_dirent_compared;
+            compare = ft_file_compared;
         }
     }
     else if (g_opt_time) {
-        compare = ft_dirent_compareat;
+        compare = ft_file_compareat;
     }
     else {
-        compare = ft_dirent_comparea;
+        compare = ft_file_comparea;
     }
 
-    return (ft_dirent_qsort(arr, 0, count - 1, compare));
+    return (ft_file_qsort(arr, 0, size - 1, compare));
 }
 
 
-static char *ft_dirent_print(struct dirent **dirents) {
-    if (!dirents) { return (0); }
+static int ft_file_print(struct s_file *arr, const size_t size) {
+    if (!arr) { return (0); }
 
-    char *output = 0;
+    int status = 0;
     /* validate '-l' flag... */
     if (!g_opt_list) {
-        output = ft_print_vertical(dirents);
-        if (!output) {
-            return (0);
-        }
+        status = ft_print_vertical(arr, size);
     }
     else {
-        output = ft_print_list(dirents);
-        if (!output) {
-            return (0);
-        }
+        /* ... */
     }
     
-    return (output);
+    return (status);
 }
 
 
-static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path, t_list **list) {
-    if (!dirents) { return (0); }
+static int ft_file_recursive_enter(struct s_file *arr, const size_t size, const char *path, t_list **list) {
+    if (!arr) { return (0); }
 
-    for (size_t i = 0; dirents[i]; i++) {
-        struct dirent dirent = *dirents[i];
-
+    for (size_t i = 0; i < size; i++) {
         /* avoid "cwd" and "pwd" dirents... */
-        if (!ft_strcmp(dirent.d_name, ".") ||
-            !ft_strcmp(dirent.d_name, "..")
+        if (!ft_strcmp(arr[i].f_name, ".") ||
+            !ft_strcmp(arr[i].f_name, "..")
         ) {
             continue;
         }
 
-        if (dirent.d_type == DT_DIR) {
+        if (S_ISDIR(arr[i].f_mode)) {
             /* validate '-a' flag... */
-            if (*dirent.d_name == '.') {
+            if (*arr[i].f_name == '.') {
                 if (!g_opt_all) {
                     continue;
                 }
             }
 
             /* create sub-path... */
-            char *subpath = 0;
+            char subpath[PATH_MAX + 1] = { 0 };
 
             /* ...also, check if supplied path ends with '/'; if not, append it first... */
             if (!ft_strendswith(path, '/')) {
-                subpath = ft_strjoin(path, "/");
-                subpath = ft_strjoin_free(subpath, dirent.d_name);
+                strlcat(subpath, path, PATH_MAX);
+                strlcat(subpath, "/", PATH_MAX);
+                strlcat(subpath, arr[i].f_name, PATH_MAX);
             }
             else {
-                subpath = ft_strjoin(path, dirent.d_name);
+                strlcat(subpath, path, PATH_MAX);
+                strlcat(subpath, arr[i].f_name, PATH_MAX);
             }
 
             /* add the new path entry to global paths list... */
-            t_list *entry = ft_lstnew(subpath);
+            t_list *entry = ft_lstnew(ft_strdup(subpath));
             if (!entry) {
                 return (1);
             }
@@ -238,10 +242,10 @@ static int ft_dirent_recursive_enter(struct dirent **dirents, const char *path, 
 }
 
 
-/* ft_dirent_comparea - compare in ascending order (alphanum) */
-static inline int ft_dirent_comparea(struct dirent *d0, struct dirent *d1) {
-    const char *n0 = d0->d_name;
-    const char *n1 = d1->d_name;
+/* ft_file_comparea - compare in ascending order (alphanum) */
+static inline int ft_file_comparea(struct s_file f0, struct s_file f1) {
+    const char *n0 = f0.f_name;
+    const char *n1 = f1.f_name;
     
     /* special case: n0 == "..", n1 == "." */
     if (!ft_strcmp(n0, "..") &&
@@ -265,10 +269,10 @@ static inline int ft_dirent_comparea(struct dirent *d0, struct dirent *d1) {
 }
 
 
-/* ft_dirent_compared - compare in descending order (alphanum) */
-static inline int ft_dirent_compared(struct dirent *d0, struct dirent *d1) {
-    const char *n0 = d0->d_name;
-    const char *n1 = d1->d_name;
+/* ft_file_compared - compare in descending order (alphanum) */
+static inline int ft_file_compared(struct s_file f0, struct s_file f1) {
+    const char *n0 = f0.f_name;
+    const char *n1 = f1.f_name;
 
     /* special case: n0 == ".", n1 == ".." */
     if (!ft_strcmp(n0, ".") &&
@@ -292,38 +296,28 @@ static inline int ft_dirent_compared(struct dirent *d0, struct dirent *d1) {
 }
 
 
-/* ft_dirent_compareat - compare in ascending order (time) */
-static inline int ft_dirent_compareat(struct dirent *d0, struct dirent *d1) {
-    struct stat st = { 0 };
-    
-    if (stat(d0->d_name, &st) == -1) { return (0); }
-    size_t t0 = st.st_mtime;
-    
-    if (stat(d1->d_name, &st) == -1) { return (0); }
-    size_t t1 = st.st_mtime;
+/* ft_file_compareat - compare in ascending order (time) */
+static inline int ft_file_compareat(struct s_file f0, struct s_file f1) {
+    size_t t0 = f0.f_mtime;
+    size_t t1 = f1.f_mtime;
 
     if (t0 < t1) { return (1); }
     else if (t0 > t1) { return (0); }
     else {
-        return (ft_dirent_comparea(d0, d1));
+        return (ft_file_comparea(f0, f1));
     }
 }
 
 
-/* ft_dirent_comparedt - compare in descending order (time) */
-static inline int ft_dirent_comparedt(struct dirent *d0, struct dirent *d1) {
-    struct stat st = { 0 };
-    
-    if (stat(d0->d_name, &st) == -1) { return (0); }
-    size_t t0 = st.st_mtime;
-    
-    if (stat(d1->d_name, &st) == -1) { return (0); }
-    size_t t1 = st.st_mtime;
+/* ft_file_comparedt - compare in descending order (time) */
+static inline int ft_file_comparedt(struct s_file f0, struct s_file f1) {
+    size_t t0 = f0.f_mtime;
+    size_t t1 = f1.f_mtime;
 
     if (t0 > t1) { return (1); }
     else if (t0 < t1) { return (0); }
     else {
-        return (ft_dirent_compared(d0, d1));
+        return (ft_file_compared(f0, f1));
     }
 }
 

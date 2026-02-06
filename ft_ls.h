@@ -35,9 +35,31 @@ extern t_list *g_paths;
 
 extern const char *g_prog;
 
+
+struct s_file {
+    char f_name[PATH_MAX];
+
+    mode_t f_mode;
+
+    time_t f_mtime;
+    time_t f_ctime;
+    time_t f_atime;
+
+    uid_t f_uid;
+    gid_t f_gid;
+
+    nlink_t f_nlink;
+
+    blkcnt_t f_blkcnt;
+
+    dev_t f_dev;
+    dev_t f_rdev;
+};
+
+
 /* ./ft_ls.c */
 
-extern char *ft_process_subdirs(const char *, t_list *);
+extern struct s_file *ft_process_subdirs(const char *, t_list *);
 
 /* ./ft_ls-utils.c */
 
@@ -53,12 +75,6 @@ extern char *ft_strjoin_free(char *, const char *);
 extern size_t ft_dircnt(const char *);
 
 
-extern size_t ft_dirent_blkcnt(struct dirent **);
-
-
-extern size_t ft_dirent_fsizmax(struct dirent **);
-
-
 extern size_t ft_numlen(long long, int);
 
 
@@ -70,16 +86,10 @@ extern int ft_getopt(int, char **);
 
 /* ./ft_ls-print.c */
 
-extern char *ft_print_vertical(struct dirent **);
-
-
-extern char *ft_print_list(struct dirent **);
-
-
-extern char *ft_print_entry(struct dirent *);
+extern int ft_print_vertical(struct s_file *, const size_t);
 
 /* ./ft_ls-sort.c */
 
-extern struct dirent **ft_dirent_qsort(struct dirent **, const size_t, const size_t, int (*)(struct dirent *, struct dirent *));
+extern struct s_file *ft_file_qsort(struct s_file *, const size_t, const size_t, int (*)(struct s_file, struct s_file));
 
 #endif /* _ft_ls_h_ */
