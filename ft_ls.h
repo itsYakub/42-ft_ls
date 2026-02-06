@@ -29,9 +29,7 @@ extern int g_opt_reverse;
 
 extern int g_opt_time;
 
-extern t_list *g_paths;
-
-extern const char *g_prog;
+extern char *g_prog;
 
 
 enum e_print_mode {

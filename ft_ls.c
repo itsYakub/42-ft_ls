@@ -12,6 +12,7 @@
  *      > top-to-bottom
  *      > based on length on single line + length of tty line, probably
  *  - [ ] fix the time sorting
+ *  - [ ] linked list sorting
  * */
 
 static struct s_file *ft_dirent_process(DIR *, const char *);
@@ -369,12 +370,10 @@ int g_opt_reverse = 0;
  * */
 int g_opt_time = 0;
 
-/* g_paths - global linked list of processed paths (default: '.')
- * */
-t_list *g_paths = 0;
-
 /* g_prog - name of the executable (av[0])
  * */
-const char *g_prog = 0;
+char *g_prog = 0;
 
+/* g_print_mode - mode of printing, selected by either '-1', '-C' or '-l' flag
+ * */
 enum e_print_mode g_print_mode = PRINT_MODE_VERTICAL;
