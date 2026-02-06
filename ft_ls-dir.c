@@ -13,15 +13,12 @@ static int ft_recurse(struct s_file *, const size_t, const char *, t_list **);
 static inline int ft_comparea(struct s_file, struct s_file);
 
 
-/* ft_compared - compare in descending order (alphanum) */
 static inline int ft_compared(struct s_file, struct s_file);
 
 
-/* ft_compareat - compare in ascending order (time) */
 static inline int ft_compareat(struct s_file, struct s_file);
 
 
-/* ft_comparedt - compare in descending order (time) */
 static inline int ft_comparedt(struct s_file, struct s_file);
 
 
@@ -29,7 +26,7 @@ extern struct s_file *ft_process_d(t_list *list) {
     if (!list) { return (0); }
 
     size_t size = 0;
-    struct s_file *files = 0;
+    struct s_file *arr = 0;
 
     const char *path = list->content;
     DIR *dir = opendir(path);
@@ -38,29 +35,29 @@ extern struct s_file *ft_process_d(t_list *list) {
     }
 
     size = ft_dircnt(path);
-    files = ft_extract(dir, path);
-    if (!files) {
+    arr = ft_extract(dir, path);
+    if (!arr) {
         return (0);
     }
     closedir(dir);
   
-    files = ft_sort(files, size);
-    if (!files) {
+    arr = ft_sort(arr, size);
+    if (!arr) {
         return (0);
     }
 
     if (g_opt_recursive) {
-        ft_recurse(files, size, path, &list);
+        ft_recurse(arr, size, path, &list);
     }
     
-    return (files);
+    return (arr);
 }
 
 
 static struct s_file *ft_extract(DIR *dir, const char *path) {
     size_t dircnt = ft_dircnt(path);
-    struct s_file *files = ft_calloc(dircnt, sizeof(struct s_file));
-    if (!files) {
+    struct s_file *arr = ft_calloc(dircnt, sizeof(struct s_file));
+    if (!arr) {
         return (0);
     }
 
@@ -76,24 +73,24 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
 
         struct stat st = { 0 };
         if (stat(subpath, &st) == -1) {
-            perror(files[i].f_name);
-            free(files); return (0);
+            perror(arr[i].f_name);
+            free(arr); return (0);
         }
 
-        ft_strlcat(files[i].f_name, dirent->d_name, PATH_MAX);
-        files[i].f_mode = st.st_mode;
-        files[i].f_mtime = st.st_mtime;
-        files[i].f_ctime = st.st_ctime;
-        files[i].f_atime = st.st_atime;
-        files[i].f_uid = st.st_uid;
-        files[i].f_gid = st.st_gid;
-        files[i].f_nlink = st.st_nlink;
-        files[i].f_blkcnt = st.st_blocks;
-        files[i].f_dev = st.st_dev;
-        files[i].f_rdev = st.st_rdev;
+        ft_strlcat(arr[i].f_name, dirent->d_name, PATH_MAX);
+        arr[i].f_mode = st.st_mode;
+        arr[i].f_mtime = st.st_mtime;
+        arr[i].f_ctime = st.st_ctime;
+        arr[i].f_atime = st.st_atime;
+        arr[i].f_uid = st.st_uid;
+        arr[i].f_gid = st.st_gid;
+        arr[i].f_nlink = st.st_nlink;
+        arr[i].f_blkcnt = st.st_blocks;
+        arr[i].f_dev = st.st_dev;
+        arr[i].f_rdev = st.st_rdev;
     }
 
-    return (files);
+    return (arr);
 }
 
 
