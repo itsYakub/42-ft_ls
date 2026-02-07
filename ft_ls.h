@@ -10,11 +10,13 @@
 #
 # include <pwd.h>        /* getpwuid() */
 # include <grp.h>        /* getgrgid() */
+# include <fcntl.h>
 # include <dirent.h>     /* opendir(), readdir(), closedir() */
 # include <unistd.h>     /* write(), readlink() */
 #
 # include <sys/stat.h>   /* stat(), lstat()*/
 # include <sys/types.h>
+# include <sys/ioctl.h>
 # include <sys/xattr.h>  /* listxattr(), getxattr() */
 #
 # include <linux/limits.h>
@@ -84,10 +86,13 @@ extern int ft_strcmp(const char *, const char *);
 extern int ft_strlast(const char *, int);
 
 
-extern char *ft_strjoin_free(char *, const char *);
-
-
 extern size_t ft_dircnt(const char *);
+
+
+extern char *ft_utoa(uint64_t, uint8_t, char[16]);
+
+
+extern int ft_getwinsize(size_t *, size_t *);
 
 /* ./ft_ls-getopt.c */
 

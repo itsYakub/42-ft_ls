@@ -20,17 +20,6 @@ extern int ft_strlast(const char *s0, int c) {
 }
 
 
-extern char *ft_strjoin_free(char *dst, const char *src) {
-    char *tmp = ft_strjoin(dst, src);
-    if (!tmp) {
-        free(dst); return (0);
-    }
-
-    free(dst), dst = tmp;
-    return (dst);
-}
-
-
 extern size_t ft_dircnt(const char *path) {
     DIR *dir = opendir(path);
     if (!dir) { return (0); }
@@ -50,34 +39,49 @@ extern size_t ft_dircnt(const char *path) {
 }
 
 
-extern size_t ft_numlen(long long n, int base) {
-	int	result = 0;
-	while (n != 0) {
-		result++;
-		n /= base;
-	}
+extern char *ft_utoa(uint64_t n, uint8_t radix, char buffer[16]) {
+    const char base[] = "0123456789abcdef";
 
-	return (result);
-}
-
-
-extern char *ft_utoa(unsigned long long n, char output[16]) {
-    const char base[] = "0123456789";
-
-    /* length of the number in base16... */
-    size_t n_l = ft_numlen(n, 10);
+    /* length of the number... */
+    size_t n_l = 0;
+    for (uint64_t tmp = n; tmp != 0; tmp /= radix) {
+        n_l++;
+    }
 
     /* append characters to array... */
-    for (size_t i = 0; n; i++, n /= 10) {
-        output[i] = base[n % 10];
+    for (size_t i = 0; n; i++, n /= 16) {
+        buffer[i] = base[n % radix];
     }
 
     /* reverse the array... */
     for (size_t i = 0; i < n_l / 2; i++) {
-        char tmp = output[i];
-        output[i] = output[n_l - 1 - i];
-        output[n_l - 1 - i] = tmp;
+        char tmp = buffer[i];
+        buffer[i] = buffer[n_l - 1 - i];
+        buffer[n_l - 1 - i] = tmp;
     }
 
-    return (output);
+    return (buffer);
+}
+
+
+extern int ft_getwinsize(size_t *w_ptr, size_t *h_ptr) {
+    int fd = ft_open("/dev/tty", O_RDONLY, 0);
+    if (fd == -1) {
+        fd = STDOUT_FILENO;
+    }
+
+    struct winsize winsize = { 0 };
+    if (ft_ioctl(fd, TIOCGWINSZ, &winsize) == -1) {
+        if (w_ptr) { *w_ptr = 0; }
+        if (h_ptr) { *h_ptr = 0; }
+        return (0);
+    }
+
+    if (w_ptr) { *w_ptr = winsize.ws_col; }
+    if (h_ptr) { *h_ptr = winsize.ws_row; }
+
+    if (fd != STDOUT_FILENO) {
+        ft_close(fd);
+    }
+    return (1);
 }

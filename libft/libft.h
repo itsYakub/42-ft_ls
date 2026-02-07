@@ -6,14 +6,15 @@
 /*   By: joleksia <joleksia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 11:34:10 by joleksia          #+#    #+#             */
-/*   Updated: 2025/05/08 09:18:42 by joleksia         ###   ########.fr       */
+/*   Updated: 2026/02/07 12:21:32 by joleksia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
-
-/* SECTION: Inclusions */
+#
+# include <stdint.h>
+# include <stddef.h>
 # include <stdlib.h>
 # include <unistd.h>
 
@@ -73,5 +74,12 @@ void	ft_lstclear(t_list **lst, void (*del)(void*));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 void	ft_lstadd_at(t_list **lst, t_list *new, size_t);
+
+/* SECTION: Additional files (non-subject) */
+
+extern ssize_t ft_read(int, void *, size_t);
+extern int ft_open(const char *, int, mode_t);
+extern int ft_close(int);
+extern int ft_ioctl(int, unsigned long, void *);
 
 #endif

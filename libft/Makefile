@@ -35,7 +35,11 @@ SRC_M = \
 	ft_putchar_fd.c \
 	ft_putstr_fd.c \
 	ft_putnbr_fd.c \
-	ft_putendl_fd.c
+	ft_putendl_fd.c \
+	ft_read.c \
+	ft_open.c \
+	ft_close.c \
+	ft_ioctl.c
 
 SRC_B = \
 	ft_lstadd_back_bonus.c \

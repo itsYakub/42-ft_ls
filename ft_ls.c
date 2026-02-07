@@ -21,7 +21,7 @@
 
 int main(int ac, char **av) {
     /* process command-line arguments... */
-    
+
     int getopt = ft_getopt(ac, av);
     if (getopt != 0) {
         return (1);

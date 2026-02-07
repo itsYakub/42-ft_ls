@@ -66,7 +66,7 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
         /* create sub-path... */
         char subpath[PATH_MAX + 1] = { 0 };
         ft_strlcat(subpath, path, PATH_MAX);
-        if (!ft_strendswith(path, '/')) {
+        if (!ft_strlast(path, '/')) {
             ft_strlcat(subpath, "/", PATH_MAX);
         }
         ft_strlcat(subpath, dirent->d_name, PATH_MAX);
@@ -140,7 +140,7 @@ static int ft_recurse(struct s_file *arr, const size_t size, const char *path, t
             /* create sub-path... */
             char subpath[PATH_MAX + 1] = { 0 };
             ft_strlcat(subpath, path, PATH_MAX);
-            if (!ft_strendswith(path, '/')) {
+            if (!ft_strlast(path, '/')) {
                 ft_strlcat(subpath, "/", PATH_MAX);
             }
             ft_strlcat(subpath, arr[i].f_name, PATH_MAX);
