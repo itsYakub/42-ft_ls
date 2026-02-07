@@ -12,7 +12,7 @@ extern int ft_strcmp(const char *s0, const char *s1) {
 }
 
 
-extern int ft_strendswith(const char *s0, int c) {
+extern int ft_strlast(const char *s0, int c) {
     if (!s0) { return (0); }
     while (*s0) { s0++; }
 
@@ -47,56 +47,6 @@ extern size_t ft_dircnt(const char *path) {
 
     closedir(dir);
     return (i);
-}
-
-
-extern size_t ft_dirent_blkcnt(struct dirent **arr) {
-    if (!arr) { return (0); }
-
-    size_t result = 0;
-    for (size_t i = 0; arr[i]; i++) {
-        struct dirent *dirent = arr[i];
-        /* validate '-a' flag... */
-        if (*dirent->d_name == '.') {
-            if (!g_opt_all) {
-                continue;
-            }
-        }
-
-        struct stat st = { 0 };
-        if (stat(dirent->d_name, &st) == -1) {
-            return (0);
-        }
-
-        result += st.st_blocks;
-    }
-    return (result);
-}
-
-
-extern size_t ft_dirent_fsizmax(struct dirent **arr) {
-    if (!arr) { return (0); }
-
-    size_t result = 0;
-    for (size_t i = 0; arr[i]; i++) {
-        struct dirent *dirent = arr[i];
-        /* validate '-a' flag... */
-        if (*dirent->d_name == '.') {
-            if (!g_opt_all) {
-                continue;
-            }
-        }
-
-        struct stat st = { 0 };
-        if (stat(dirent->d_name, &st) == -1) {
-            return (0);
-        }
-
-        result = (__off_t) result > st.st_size ?
-            result :
-            (size_t) st.st_size;
-    }
-    return (result);
 }
 
 

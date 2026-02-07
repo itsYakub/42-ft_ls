@@ -81,19 +81,13 @@ extern struct s_file *ft_process_f(t_list *);
 extern int ft_strcmp(const char *, const char *);
 
 
-extern int ft_strendswith(const char *, int);
+extern int ft_strlast(const char *, int);
 
 
 extern char *ft_strjoin_free(char *, const char *);
 
 
 extern size_t ft_dircnt(const char *);
-
-
-extern size_t ft_numlen(long long, int);
-
-
-extern char *ft_utoa(unsigned long long, char [16]);
 
 /* ./ft_ls-getopt.c */
 
