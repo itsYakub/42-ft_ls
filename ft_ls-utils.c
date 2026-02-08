@@ -39,17 +39,23 @@ extern size_t ft_dircnt(const char *path) {
 }
 
 
-extern char *ft_utoa(uint64_t n, uint8_t radix, char buffer[16]) {
-    const char base[] = "0123456789abcdef";
-
-    /* length of the number... */
+extern size_t ft_numlen(const size_t n, const uint8_t radix) {
     size_t n_l = 0;
     for (uint64_t tmp = n; tmp != 0; tmp /= radix) {
         n_l++;
     }
+    return (n_l);
+}
+
+
+extern char *ft_utoa(uint64_t n, uint8_t radix, char buffer[16]) {
+    const char base[] = "0123456789abcdef";
+
+    /* length of the number... */
+    size_t n_l = ft_numlen(n, radix);
 
     /* append characters to array... */
-    for (size_t i = 0; n; i++, n /= 16) {
+    for (size_t i = 0; n; i++, n /= radix) {
         buffer[i] = base[n % radix];
     }
 

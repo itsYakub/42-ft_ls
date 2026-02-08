@@ -52,6 +52,8 @@ extern enum e_print_mode g_print_mode;
 struct s_file {
     char f_name[PATH_MAX];
 
+    off_t f_size;
+
     mode_t f_mode;
 
     time_t f_mtime;
@@ -87,6 +89,9 @@ extern int ft_strlast(const char *, int);
 
 
 extern size_t ft_dircnt(const char *);
+
+
+extern size_t ft_numlen(const size_t, const uint8_t);
 
 
 extern char *ft_utoa(uint64_t, uint8_t, char[16]);

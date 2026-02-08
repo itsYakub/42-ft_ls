@@ -161,18 +161,124 @@ static size_t ft_column_count(struct s_file *arr, const size_t size, struct s_co
 
 /* ------------------------------------------------------------------------- */
 
+static char *ft_print_perm(struct s_file, char [16]);
+
+
+static char *ft_print_date(struct s_file, char [128]);
+
+
 static int ft_print_long(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
+    /* Total blocks and longest address...  */
+    size_t blocks = 0;
+    off_t sizemax = 0;
     for (size_t i = 0; i < size; i++) {
+        struct s_file file = arr[i];
         /* validate '-a' flag... */
-        if (*arr[i].f_name == '.') {
+        if (*file.f_name == '.') {
             if (!g_opt_all) {
                 continue;
             }
         }
 
-        ft_putendl_fd(arr[i].f_name, 1);
+        blocks += file.f_blkcnt / 2;
+        sizemax = file.f_size > sizemax ? file.f_size : sizemax;
+    }
+    sizemax = ft_numlen(sizemax, 10);
+
+    /* Total blocks... */
+    ft_putstr_fd("total ", 1);
+    ft_putnbr_fd(blocks, 1);
+    ft_putchar_fd('\n', 1);
+
+    for (size_t i = 0; i < size; i++) {
+        struct s_file file = arr[i];
+        /* validate '-a' flag... */
+        if (*file.f_name == '.') {
+            if (!g_opt_all) {
+                continue;
+            }
+        }
+
+        /* print permissions... */
+        char buffer[128] = { 0 };
+        ft_print_perm(file, buffer);
+        ft_putstr_fd(buffer, 1); ft_putchar_fd(' ', 1);
+
+        /* print number of links... */
+        ft_putnbr_fd(file.f_nlink, 1); ft_putchar_fd(' ', 1);
+
+        /* print owner... */
+        struct passwd *passwd = getpwuid(file.f_uid);
+        ft_putstr_fd(passwd->pw_name, 1); ft_putchar_fd(' ', 1);
+        
+        /* print group... */
+        struct group *group = getgrgid(file.f_gid);
+        ft_putstr_fd(group->gr_name, 1); ft_putchar_fd(' ', 1);
+
+        /* print address... */
+        size_t numlen = ft_numlen(file.f_size, 10);
+        for (size_t i = 0; i < sizemax - numlen; i++) {
+            ft_putchar_fd(' ', 1);
+        }
+        ft_putnbr_fd(file.f_size, 1);
+        ft_putchar_fd(' ', 1);
+
+        /* print date... */
+        ft_print_date(file, buffer);
+        ft_putstr_fd(buffer, 1); ft_putchar_fd(' ', 1);
+
+        /* print name... */
+        ft_putstr_fd(arr[i].f_name, 1);
+
+        ft_putchar_fd('\n', 1);
     }
     return (1);
+}
+
+
+static char *ft_print_perm(struct s_file file, char buffer[16]) {
+    /* file type... */
+    switch (file.f_mode & S_IFMT) {
+        case (S_IFDIR):  { *buffer = 'd'; } break;
+        case (S_IFCHR):  { *buffer = 'c'; } break;
+        case (S_IFBLK):  { *buffer = 'b'; } break;
+        case (S_IFREG):  { *buffer = '-'; } break;
+        case (S_IFIFO):  { *buffer = 'f'; } break;
+        case (S_IFLNK):  { *buffer = 'l'; } break;
+        case (S_IFSOCK): { *buffer = 's'; } break;
+        default: {
+            *buffer = '?';
+        } break;
+    }
+
+    /* user permissions... */
+    buffer[1] = file.f_mode & S_IRUSR ? 'r' : '-';
+    buffer[2] = file.f_mode & S_IWUSR ? 'w' : '-';
+    buffer[3] = file.f_mode & S_IXUSR ? 'x' : '-';
+    /* group permissions... */
+    buffer[4] = file.f_mode & S_IRGRP ? 'r' : '-';
+    buffer[5] = file.f_mode & S_IWGRP ? 'w' : '-';
+    buffer[6] = file.f_mode & S_IXGRP ? 'x' : '-';
+    /* other permissions... */
+    buffer[7] = file.f_mode & S_IROTH ? 'r' : '-';
+    buffer[8] = file.f_mode & S_IWOTH ? 'w' : '-';
+    buffer[9] = file.f_mode & S_IXOTH ? 'x' : '-';
+
+    /* null-terminator... */
+    for (size_t i = 10; i < 1; i++) { buffer[i] = 0; }
+    return (buffer);
+}
+
+
+static char *ft_print_date(struct s_file file, char buffer[128]) {
+    const char *ct = ctime(&file.f_mtime);
+    if (!ct) {
+        return (0);
+    }
+
+    ft_memset(buffer, 0, 128);
+    ft_strlcpy(&buffer[0], ct + 4, 13);
+    return (buffer);
 }

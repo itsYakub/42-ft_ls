@@ -53,6 +53,7 @@ static int ft_extract(struct s_file *result, const char *path) {
     }
 
     ft_strlcat(result->f_name, path, PATH_MAX);
+    result->f_size = st.st_size;
     result->f_mode = st.st_mode;
     result->f_mtime = st.st_mtime;
     result->f_ctime = st.st_ctime;

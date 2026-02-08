@@ -78,6 +78,7 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
         }
 
         ft_strlcat(arr[i].f_name, dirent->d_name, PATH_MAX);
+        arr[i].f_size= st.st_size;
         arr[i].f_mode = st.st_mode;
         arr[i].f_mtime = st.st_mtime;
         arr[i].f_ctime = st.st_ctime;
