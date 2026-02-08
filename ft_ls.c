@@ -2,21 +2,18 @@
 
 /*  ft_ls:
  *  - required flags:
- *      > [ ] -l: use a long listing format
+ *      > [X] -l: use a long listing format
  *      > [X] -R: list subdirectories recursively
  *      > [X] -a: do not ignore entries starting with .
  *      > [X] -r: reverse order while sorting
  *      > [X] -t: sort by time, newest first; see --time (time/date format with -l; see TIME_STYLE below)
- *  - [ ] stylized formatting for regular output (check how ls libft/ behave)"
+ *  - [X] stylized formatting for regular output (check how ls libft/ behave)"
  *      > columns
  *      > top-to-bottom
  *      > based on length on single line + length of tty line, probably
  *  - [ ] fix the time sorting
  *  - [ ] linked list sorting
  *  - [X] figure out the COLUMNS and LINES
- *
- *  Helpful:
- *  - https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
  * */
 
 int main(int ac, char **av) {
@@ -65,7 +62,7 @@ int main(int ac, char **av) {
         size_t size = 0;
         while (*arr[size].f_name) { size++; }
 
-        ft_print(arr, size);
+        ft_print(arr, size, FILE_MODE_F);
         free(arr), arr = 0;
         
         ft_lstclear(&l_files, free);
@@ -94,7 +91,7 @@ int main(int ac, char **av) {
             ft_putendl_fd(":", 1);
         }
 
-        ft_print(arr, size);
+        ft_print(arr, size, FILE_MODE_D);
         free(arr), arr = 0;
     }
 

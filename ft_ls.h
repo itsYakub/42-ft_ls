@@ -49,6 +49,16 @@ enum e_print_mode {
 extern enum e_print_mode g_print_mode;
 
 
+enum e_file_mode {
+    FILE_MODE_F = 0,
+    FILE_MODE_D = 1,
+
+    /* ... */
+
+    FILE_MODE_COUNT
+};
+
+
 struct s_file {
     char f_name[PATH_MAX];
 
@@ -105,7 +115,7 @@ extern int ft_getopt(int, char **);
 
 /* ./ft_ls-print.c */
 
-extern int ft_print(struct s_file *, const size_t);
+extern int ft_print(struct s_file *, const size_t, int);
 
 
 /* ./ft_ls-sort.c */

@@ -7,17 +7,17 @@ static int ft_print_column(struct s_file *, const size_t);
 static int ft_print_vertical(struct s_file *, const size_t);
 
 
-static int ft_print_long(struct s_file *, const size_t);
+static int ft_print_long(struct s_file *, const size_t, int);
 
 
-extern int ft_print(struct s_file *arr, const size_t size) {
+extern int ft_print(struct s_file *arr, const size_t size, int mode) {
     if (!arr) { return (0); }
 
     int status = 0;
     switch (g_print_mode) {
-        case (PRINT_MODE_COLUMN):   { status = ft_print_column(arr, size);   } break;
-        case (PRINT_MODE_VERTICAL): { status = ft_print_vertical(arr, size); } break;
-        case (PRINT_MODE_LONG):     { status = ft_print_long(arr, size);     } break;
+        case (PRINT_MODE_COLUMN):   { status = ft_print_column(arr, size);     } break;
+        case (PRINT_MODE_VERTICAL): { status = ft_print_vertical(arr, size);   } break;
+        case (PRINT_MODE_LONG):     { status = ft_print_long(arr, size, mode); } break;
 
         default: { /* ... */ } break;
     }
@@ -167,7 +167,7 @@ static char *ft_print_perm(struct s_file, char [16]);
 static char *ft_print_date(struct s_file, char [128]);
 
 
-static int ft_print_long(struct s_file *arr, const size_t size) {
+static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
     if (!arr) { return (0); }
 
     /* Total blocks and longest address...  */
@@ -188,9 +188,11 @@ static int ft_print_long(struct s_file *arr, const size_t size) {
     sizemax = ft_numlen(sizemax, 10);
 
     /* Total blocks... */
-    ft_putstr_fd("total ", 1);
-    ft_putnbr_fd(blocks, 1);
-    ft_putchar_fd('\n', 1);
+    if (mode == FILE_MODE_D) {
+        ft_putstr_fd("total ", 1);
+        ft_putnbr_fd(blocks, 1);
+        ft_putchar_fd('\n', 1);
+    }
 
     for (size_t i = 0; i < size; i++) {
         struct s_file file = arr[i];
