@@ -72,7 +72,7 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
         ft_strlcat(subpath, dirent->d_name, PATH_MAX);
 
         struct stat st = { 0 };
-        if (stat(subpath, &st) == -1) {
+        if (lstat(subpath, &st) == -1) {
             perror(arr[i].f_name);
             free(arr); return (0);
         }
@@ -83,6 +83,9 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
         arr[i].f_mtime = st.st_mtime;
         arr[i].f_ctime = st.st_ctime;
         arr[i].f_atime = st.st_atime;
+        arr[i].f_atim = st.st_atim;
+        arr[i].f_ctim = st.st_ctim;
+        arr[i].f_mtim = st.st_mtim;
         arr[i].f_uid = st.st_uid;
         arr[i].f_gid = st.st_gid;
         arr[i].f_nlink = st.st_nlink;
@@ -162,7 +165,6 @@ static int ft_recurse(struct s_file *arr, const size_t size, const char *path, t
 }
 
 
-/* ft_comparea - compare in ascending order (alphanum) */
 static inline int ft_comparea(struct s_file f0, struct s_file f1) {
     const char *n0 = f0.f_name;
     const char *n1 = f1.f_name;
@@ -189,7 +191,6 @@ static inline int ft_comparea(struct s_file f0, struct s_file f1) {
 }
 
 
-/* ft_compared - compare in descending order (alphanum) */
 static inline int ft_compared(struct s_file f0, struct s_file f1) {
     const char *n0 = f0.f_name;
     const char *n1 = f1.f_name;
@@ -216,11 +217,15 @@ static inline int ft_compared(struct s_file f0, struct s_file f1) {
 }
 
 
-/* ft_compareat - compare in ascending order (time) */
 static inline int ft_compareat(struct s_file f0, struct s_file f1) {
-    size_t t0 = f0.f_mtime;
-    size_t t1 = f1.f_mtime;
+    size_t t0 = f0.f_mtim.tv_sec;
+    size_t t1 = f1.f_mtim.tv_sec;
 
+    if (t0 < t1) { return (1); }
+    else if (t0 > t1) { return (0); }
+    
+    t0 = f0.f_mtim.tv_nsec;
+    t1 = f1.f_mtim.tv_nsec;
     if (t0 < t1) { return (1); }
     else if (t0 > t1) { return (0); }
     else {
@@ -229,11 +234,15 @@ static inline int ft_compareat(struct s_file f0, struct s_file f1) {
 }
 
 
-/* ft_comparedt - compare in descending order (time) */
 static inline int ft_comparedt(struct s_file f0, struct s_file f1) {
-    size_t t0 = f0.f_mtime;
-    size_t t1 = f1.f_mtime;
+    size_t t0 = f0.f_mtim.tv_sec;
+    size_t t1 = f1.f_mtim.tv_sec;
 
+    if (t0 > t1) { return (1); }
+    else if (t0 < t1) { return (0); }
+    
+    t0 = f0.f_mtim.tv_nsec;
+    t1 = f1.f_mtim.tv_nsec;
     if (t0 > t1) { return (1); }
     else if (t0 < t1) { return (0); }
     else {

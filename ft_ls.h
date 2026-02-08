@@ -67,8 +67,13 @@ struct s_file {
     mode_t f_mode;
 
     time_t f_mtime;
+    struct timespec f_mtim;
+
     time_t f_ctime;
+    struct timespec f_ctim;
+
     time_t f_atime;
+    struct timespec f_atim;
 
     uid_t f_uid;
     gid_t f_gid;

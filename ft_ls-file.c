@@ -48,7 +48,7 @@ static int ft_extract(struct s_file *result, const char *path) {
     if (!result) { return (0); }
     
     struct stat st = { 0 };
-    if (stat(path, &st) == -1) {
+    if (lstat(path, &st) == -1) {
         return (0);
     }
 
@@ -56,8 +56,11 @@ static int ft_extract(struct s_file *result, const char *path) {
     result->f_size = st.st_size;
     result->f_mode = st.st_mode;
     result->f_mtime = st.st_mtime;
+    result->f_mtime = st.st_mtime;
     result->f_ctime = st.st_ctime;
-    result->f_atime = st.st_atime;
+    result->f_atim = st.st_atim;
+    result->f_ctim = st.st_ctim;
+    result->f_mtim = st.st_mtim;
     result->f_uid = st.st_uid;
     result->f_gid = st.st_gid;
     result->f_nlink = st.st_nlink;
@@ -145,9 +148,14 @@ static inline int ft_compared(struct s_file f0, struct s_file f1) {
 
 
 static inline int ft_compareat(struct s_file f0, struct s_file f1) {
-    size_t t0 = f0.f_mtime;
-    size_t t1 = f1.f_mtime;
+    size_t t0 = f0.f_mtim.tv_sec;
+    size_t t1 = f1.f_mtim.tv_sec;
 
+    if (t0 < t1) { return (1); }
+    else if (t0 > t1) { return (0); }
+    
+    t0 = f0.f_mtim.tv_nsec;
+    t1 = f1.f_mtim.tv_nsec;
     if (t0 < t1) { return (1); }
     else if (t0 > t1) { return (0); }
     else {
@@ -157,9 +165,14 @@ static inline int ft_compareat(struct s_file f0, struct s_file f1) {
 
 
 static inline int ft_comparedt(struct s_file f0, struct s_file f1) {
-    size_t t0 = f0.f_mtime;
-    size_t t1 = f1.f_mtime;
+    size_t t0 = f0.f_mtim.tv_sec;
+    size_t t1 = f1.f_mtim.tv_sec;
 
+    if (t0 > t1) { return (1); }
+    else if (t0 < t1) { return (0); }
+    
+    t0 = f0.f_mtim.tv_nsec;
+    t1 = f1.f_mtim.tv_nsec;
     if (t0 > t1) { return (1); }
     else if (t0 < t1) { return (0); }
     else {

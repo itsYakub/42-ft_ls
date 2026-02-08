@@ -1,13 +1,15 @@
 #include "./ft_ls.h"
 
 /*  ft_ls:
- *  - [ ] fix the time sorting
+ *  - [X] fix the time sorting
  *  - [ ] linked list sorting
+ *  - [ ] leaks
  * */
 
 int main(int ac, char **av) {
     /* process command-line arguments... */
 
+    time(0);
     int getopt = ft_getopt(ac, av);
     if (getopt != 0) {
         return (1);
