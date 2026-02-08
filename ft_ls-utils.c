@@ -72,8 +72,8 @@ extern int ft_getwinsize(size_t *w_ptr, size_t *h_ptr) {
 
     struct winsize winsize = { 0 };
     if (ft_ioctl(fd, TIOCGWINSZ, &winsize) == -1) {
-        if (w_ptr) { *w_ptr = 0; }
-        if (h_ptr) { *h_ptr = 0; }
+        if (w_ptr) { *w_ptr = 80; }
+        if (h_ptr) { *h_ptr = 24; }
         return (0);
     }
 
