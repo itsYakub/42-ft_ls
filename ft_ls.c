@@ -1,19 +1,8 @@
 #include "./ft_ls.h"
 
 /*  ft_ls:
- *  - required flags:
- *      > [X] -l: use a long listing format
- *      > [X] -R: list subdirectories recursively
- *      > [X] -a: do not ignore entries starting with .
- *      > [X] -r: reverse order while sorting
- *      > [X] -t: sort by time, newest first; see --time (time/date format with -l; see TIME_STYLE below)
- *  - [X] stylized formatting for regular output (check how ls libft/ behave)"
- *      > columns
- *      > top-to-bottom
- *      > based on length on single line + length of tty line, probably
  *  - [ ] fix the time sorting
  *  - [ ] linked list sorting
- *  - [X] figure out the COLUMNS and LINES
  * */
 
 int main(int ac, char **av) {
@@ -26,7 +15,7 @@ int main(int ac, char **av) {
 
     /* extract files / directories... */
     
-    t_list *l_files = 0;
+    t_list *l_file = 0;
     t_list *l_dirs  = 0;
     for (size_t i = 1; i < (size_t) ac; i++) {
         if (*av[i] == '-') { continue; }
@@ -40,20 +29,20 @@ int main(int ac, char **av) {
         switch ((st.st_mode & S_IFMT)) {
             case (S_IFDIR): { ft_lstadd_back(&l_dirs, ft_lstnew(path)); } break;
             default: {
-                ft_lstadd_back(&l_files, ft_lstnew(path));
+                ft_lstadd_back(&l_file, ft_lstnew(path));
             }
         }
     }
     
     /* default case... */
-    if (!l_files && !l_dirs) {
+    if (!l_file && !l_dirs) {
         l_dirs = ft_lstnew(ft_strdup("."));
     }
 
     /* process files... */
 
-    if (l_files) {
-        struct s_file *arr = ft_process_f(l_files);
+    if (l_file) {
+        struct s_file *arr = ft_process_f(l_file);
         if (!arr) {
             ft_lstclear(&l_dirs, free);
             return (1);
@@ -64,15 +53,14 @@ int main(int ac, char **av) {
 
         ft_print(arr, size, FILE_MODE_F);
         free(arr), arr = 0;
-        
-        ft_lstclear(&l_files, free);
     }
 
     /* process directories... */
 
     for (t_list *list = l_dirs; list; list = list->next) {
         struct s_file *arr= ft_process_d(list);
-        if (!arr) {
+        if (!arr) { 
+            ft_lstclear(&l_file, free);
             ft_lstclear(&l_dirs, free);
             return (1);
         }
@@ -82,8 +70,8 @@ int main(int ac, char **av) {
         
         const char *path = list->content;
         size_t lstsize = ft_lstsize(l_dirs);
-        if (lstsize > 1) {
-            if (list != l_dirs) {
+        if (lstsize > 1 || l_file) {
+            if (list != l_dirs || l_file) {
                 ft_putchar_fd(10, 1);
             }
 
@@ -94,7 +82,8 @@ int main(int ac, char **av) {
         ft_print(arr, size, FILE_MODE_D);
         free(arr), arr = 0;
     }
-
+        
+    ft_lstclear(&l_file, free);
     ft_lstclear(&l_dirs, free);
 
     return (0);
