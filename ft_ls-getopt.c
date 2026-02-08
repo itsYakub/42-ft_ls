@@ -49,13 +49,17 @@ extern int ft_getopt(int ac, char **av) {
             else {
                 do {
                     switch (*opt) {
-                        case ('1'): { g_print_mode = 0;    } break;
-                        case ('C'): { g_print_mode = 1;    } break;
-                        case ('l'): { g_print_mode = 2;    } break;
                         case ('a'): { g_opt_all = 1;       } break;
                         case ('t'): { g_opt_time = 1;      } break;
                         case ('r'): { g_opt_reverse = 1;   } break;
                         case ('R'): { g_opt_recursive = 1; } break;
+                        case ('C'): { g_print_mode = 1;    } break;
+                        case ('l'): { g_print_mode = 2;    } break;
+                        case ('1'): {
+                            if (g_print_mode != 2) {
+                                g_print_mode = 0;
+                            }
+                        } break;
 
                         default: {
                             ft_putstr_fd(g_prog, 1);
