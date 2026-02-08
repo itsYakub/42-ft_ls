@@ -13,7 +13,7 @@
  *      > based on length on single line + length of tty line, probably
  *  - [ ] fix the time sorting
  *  - [ ] linked list sorting
- *  - [ ] figure out the COLUMNS and LINES
+ *  - [X] figure out the COLUMNS and LINES
  *
  *  Helpful:
  *  - https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
