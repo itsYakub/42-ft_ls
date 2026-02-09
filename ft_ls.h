@@ -125,6 +125,18 @@ extern int ft_print(struct s_file *, const size_t, int);
 
 /* ./ft_ls-sort.c */
 
+extern int ft_comparea(struct s_file, struct s_file);
+
+
+extern int ft_compared(struct s_file, struct s_file);
+
+
+extern int ft_compareat(struct s_file, struct s_file);
+
+
+extern int ft_comparedt(struct s_file, struct s_file);
+
+
 extern struct s_file *ft_qsort(struct s_file *, const size_t, const size_t, int (*)(struct s_file, struct s_file));
 
 #endif /* _ft_ls_h_ */
