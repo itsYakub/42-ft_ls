@@ -57,6 +57,9 @@ int main(int ac, char **av) {
         free(arr), arr = 0;
     }
 
+    /* sort directories... */
+    l_dirs = ft_lstsort(l_dirs);
+
     /* process directories... */
 
     for (t_list *list = l_dirs; list; list = list->next) {

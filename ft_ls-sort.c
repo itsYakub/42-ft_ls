@@ -3,7 +3,7 @@
 static int ft_part(void *, const size_t, const size_t, const size_t, int (*)(void *, void *));
 
 
-extern struct s_file *ft_qsort(struct s_file *arr, const size_t size, const size_t low, const size_t high, int (*compare)(void *, void *)) {
+extern void *ft_qsort(void *arr, const size_t size, const size_t low, const size_t high, int (*compare)(void *, void *)) {
     if (!arr)       { return (0); }
     if (!compare)   { return (0); }
 

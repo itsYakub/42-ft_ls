@@ -17,6 +17,7 @@ SRCS	= ./ft_ls.c			\
 		  ./ft_ls-dir.c		\
 		  ./ft_ls-file.c	\
 		  ./ft_ls-sort.c	\
+		  ./ft_ls-lstsort.c	\
 		  ./ft_ls-utils.c	\
 		  ./ft_ls-print.c
 

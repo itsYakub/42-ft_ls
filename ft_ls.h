@@ -126,6 +126,22 @@ extern int ft_getopt(int, char **);
 extern int ft_print(struct s_file *, const size_t, int);
 
 
+/* ./ft_ls-lstsort.c */
+
+extern int ft_comparela(void *, void *);
+
+
+extern int ft_compareld(void *, void *);
+
+
+extern int ft_comparelat(void *, void *);
+
+
+extern int ft_compareldt(void *, void *);
+
+
+extern t_list *ft_lstsort(t_list *);
+
 /* ./ft_ls-sort.c */
 
 extern int ft_comparefa(void *, void *);
@@ -140,6 +156,6 @@ extern int ft_comparefat(void *, void *);
 extern int ft_comparefdt(void *, void *);
 
 
-extern struct s_file *ft_qsort(struct s_file *, const size_t, const size_t, const size_t, int (*)(void *, void *));
+extern void *ft_qsort(void *, const size_t, const size_t, const size_t, int (*)(void *, void *));
 
 #endif /* _ft_ls_h_ */
