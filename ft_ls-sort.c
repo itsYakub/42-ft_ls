@@ -29,6 +29,6 @@ static int ft_part(void *arr, const size_t size, const size_t low, const size_t 
             i++;
         }
     }
-    ft_swap(&array[i * size], &array[high * size], size);
+    ft_swap(&array[i * size], pivot, size);
     return (i);
 }

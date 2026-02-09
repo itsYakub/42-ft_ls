@@ -36,10 +36,9 @@ static int ft_extract(struct s_file *result, const char *path) {
     if (!result) { return (0); }
     
     struct stat st = { 0 };
-    if (lstat(path, &st) == -1) {
+    if (stat(path, &st) == -1) {
         return (0);
     }
-
     ft_strlcat(result->f_name, path, PATH_MAX);
     result->f_size = st.st_size;
     result->f_mode = st.st_mode;
@@ -84,8 +83,8 @@ static struct s_file *ft_sort(struct s_file *arr, const size_t size) {
 
 
 extern int ft_comparefa(void *f0, void *f1) {
-    const char *n0 = ((struct s_file *) f0)->f_name;
-    const char *n1 = ((struct s_file *) f1)->f_name;
+    const char *n0, *name0 = n0 = ((struct s_file *) f0)->f_name;
+    const char *n1, *name1 = n1 = ((struct s_file *) f1)->f_name;
     
     /* special case: n0 == "..", n1 == "." */
     if (!ft_strcmp(n0, "..") &&
@@ -105,13 +104,18 @@ extern int ft_comparefa(void *f0, void *f1) {
         if (*n1) { n1++; }
     }
 
+    if (!*n0 && !*n1) {
+        size_t s0 = ft_strlen(name0),
+               s1 = ft_strlen(name1);
+        return (s0 < s1);
+    }
     return (ft_strcmp(n0, n1) < 0);
 }
 
 
 extern int ft_comparefd(void *f0, void *f1) {
-    const char *n0 = ((struct s_file *) f0)->f_name;
-    const char *n1 = ((struct s_file *) f1)->f_name;
+    const char *n0, *name0 = n0 = ((struct s_file *) f0)->f_name;
+    const char *n1, *name1 = n1 = ((struct s_file *) f1)->f_name;
 
     /* special case: n0 == ".", n1 == ".." */
     if (!ft_strcmp(n0, ".") &&
@@ -131,6 +135,11 @@ extern int ft_comparefd(void *f0, void *f1) {
         if (*n1) { n1++; }
     }
 
+    if (!*n0 && !*n1) {
+        size_t s0 = ft_strlen(name0),
+               s1 = ft_strlen(name1);
+        return (s0 > s1);
+    }
     return (ft_strcmp(n0, n1) > 0);
 }
 

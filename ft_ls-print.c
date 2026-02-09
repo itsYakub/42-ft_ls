@@ -81,7 +81,8 @@ static int ft_print_vertical(struct s_file *arr, const size_t size) {
     }
 
     size_t ncols = ft_column_count(arr_f, size_f, col_info);
-    size_t nrows = (size_f + ncols - 1) / ncols;
+    size_t nrows = ncols > 0 ? 
+        (size_f + ncols - 1) / ncols : 0;
 
     struct s_col_info info = col_info[ncols - 1];
     for (size_t i = 0; i < nrows; i++) {

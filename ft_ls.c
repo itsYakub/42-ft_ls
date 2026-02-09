@@ -2,6 +2,7 @@
 
 /*  ft_ls:
  *  - [ ] leaks
+ *  - [ ] error messages
  * */
 
 int main(int ac, char **av) {
@@ -14,15 +15,22 @@ int main(int ac, char **av) {
     }
 
     /* extract files / directories... */
-    
+   
+    size_t f_process = 0;
     t_list *l_file = 0;
     t_list *l_dirs  = 0;
     for (size_t i = 1; i < (size_t) ac; i++) {
         if (*av[i] == '-') { continue; }
 
+        f_process++;
         struct stat st = { 0 };
         if (stat(av[i], &st) == -1) {
-            return (1);
+            ft_putstr_fd(g_prog, 2);
+            ft_putstr_fd(": cannot access '", 2);
+            ft_putstr_fd(av[i], 2);
+            ft_putstr_fd("': ", 2);
+            ft_putendl_fd(strerror(errno), 2);
+            continue;
         }
 
         char *path = ft_strdup(av[i]);
@@ -35,7 +43,7 @@ int main(int ac, char **av) {
     }
     
     /* default case... */
-    if (!l_file && !l_dirs) {
+    if (!l_file && !l_dirs && !f_process) {
         l_dirs = ft_lstnew(ft_strdup("."));
     }
 
@@ -52,38 +60,47 @@ int main(int ac, char **av) {
         while (*arr[size].f_name) { size++; }
 
         ft_print(arr, size, FILE_MODE_F);
+        if (l_dirs) {
+            ft_putchar_fd('\n', 1);
+        }
         free(arr), arr = 0;
     }
 
-    /* sort directories... */
-    l_dirs = ft_lstsort(l_dirs);
-
     /* process directories... */
+   
+    if (l_dirs) {
+        l_dirs = ft_lstsort(l_dirs);
 
-    for (t_list *list = l_dirs; list; list = list->next) {
-        struct s_file *arr= ft_process_d(list);
-        if (!arr) { 
-            ft_lstclear(&l_file, free);
-            ft_lstclear(&l_dirs, free);
-            return (1);
-        }
-
-        size_t size = 0;
-        while (ft_isprint(*arr[size].f_name)) { size++; }
-        
-        const char *path = list->content;
-        size_t lstsize = ft_lstsize(l_dirs);
-        if (lstsize > 1 || l_file) {
-            if (list != l_dirs || l_file) {
-                ft_putchar_fd(10, 1);
+        for (t_list *list = l_dirs; list; list = list->next) {
+            struct s_file *arr= ft_process_d(list);
+            if (!arr) { 
+                ft_lstclear(&l_file, free);
+                ft_lstclear(&l_dirs, free);
+                return (1);
             }
 
-            ft_putstr_fd(path, 1);
-            ft_putendl_fd(":", 1);
-        }
+            const char *path = list->content;
+            size_t size = ft_dircnt(path);
+            size_t lstsize = ft_lstsize(l_dirs);
+            if (lstsize > 1 || l_file || f_process) {
+                ft_putstr_fd(path, 1);
+                ft_putendl_fd(":", 1);
+            }
 
-        ft_print(arr, size, FILE_MODE_D);
-        free(arr), arr = 0;
+            if (size <= 2) {
+                if (g_opt_all) {
+                    ft_print(arr, size, FILE_MODE_D);
+                }
+            }
+            else {
+                ft_print(arr, size, FILE_MODE_D);
+            }
+
+            if (list->next) {
+                ft_putchar_fd('\n', 1);
+            }
+            free(arr), arr = 0;
+        }
     }
         
     ft_lstclear(&l_file, free);

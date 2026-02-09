@@ -43,8 +43,11 @@ extern struct s_file *ft_process_d(t_list *list) {
 
 
 static struct s_file *ft_extract(DIR *dir, const char *path) {
-    size_t dircnt = ft_dircnt(path);
-    struct s_file *arr = ft_calloc(dircnt, sizeof(struct s_file));
+    size_t dircnt = 0;
+    struct s_file *arr = 0;
+        
+    dircnt = ft_dircnt(path);    
+    arr = ft_calloc(dircnt, sizeof(struct s_file));
     if (!arr) {
         return (0);
     }
@@ -61,7 +64,6 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
 
         struct stat st = { 0 };
         if (lstat(subpath, &st) == -1) {
-            perror(arr[i].f_name);
             free(arr); return (0);
         }
 
