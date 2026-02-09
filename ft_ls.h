@@ -95,6 +95,18 @@ extern struct s_file *ft_process_d(t_list *);
 
 extern struct s_file *ft_process_f(t_list *);
 
+
+extern int ft_comparefa(void *, void *);
+
+
+extern int ft_comparefd(void *, void *);
+
+
+extern int ft_comparefat(void *, void *);
+
+
+extern int ft_comparefdt(void *, void *);
+
 /* ./ft_ls-utils.c */
 
 extern int ft_strcmp(const char *, const char *);
@@ -143,18 +155,6 @@ extern int ft_compareldt(void *, void *);
 extern t_list *ft_lstsort(t_list *);
 
 /* ./ft_ls-sort.c */
-
-extern int ft_comparefa(void *, void *);
-
-
-extern int ft_comparefd(void *, void *);
-
-
-extern int ft_comparefat(void *, void *);
-
-
-extern int ft_comparefdt(void *, void *);
-
 
 extern void *ft_qsort(void *, const size_t, const size_t, const size_t, int (*)(void *, void *));
 

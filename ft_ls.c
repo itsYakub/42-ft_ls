@@ -1,8 +1,6 @@
 #include "./ft_ls.h"
 
 /*  ft_ls:
- *  - [X] fix the time sorting
- *  - [ ] linked list sorting
  *  - [ ] leaks
  * */
 

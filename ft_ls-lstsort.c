@@ -23,24 +23,26 @@ extern t_list *ft_lstsort(t_list *list) {
         return (list);
     }
 
-    for (size_t i = 0; i < size; i++) {
-        arr[i] = list->content;
+    size_t i = 0;
+    for (t_list *item = list; item; item = item->next) {
+        arr[i++] = item->content; 
     }
 
     arr = ft_qsort(arr, sizeof(*arr), 0, size - 1, compare);
 
-    size_t i = 0;
+    i = 0;
     for (t_list *item = list; item; item = item->next) {
         item->content = arr[i++];
     }
+    free(arr);
 
     return (list);
 }
 
 
 extern int ft_comparela(void *v0, void *v1) {
-    const char *n0 = (const char *) v0;
-    const char *n1 = (const char *) v1;
+    char *n0 = *((char **) v0);
+    char *n1 = *((char **) v1);
     
     /* special case: n0 == "..", n1 == "." */
     if (!ft_strcmp(n0, "..") &&
@@ -65,8 +67,8 @@ extern int ft_comparela(void *v0, void *v1) {
 
 
 extern int ft_compareld(void *v0, void *v1) {
-    const char *n0 = (const char *) v0;
-    const char *n1 = (const char *) v1;
+    char *n0 = *((char **) v0);
+    char *n1 = *((char **) v1);
 
     /* special case: n0 == ".", n1 == ".." */
     if (!ft_strcmp(n0, ".") &&
