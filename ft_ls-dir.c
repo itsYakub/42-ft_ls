@@ -89,23 +89,23 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
 static struct s_file *ft_sort(struct s_file *arr, const size_t size) {
     if (!arr) { return (0); }
 
-    int (*compare)(struct s_file, struct s_file) = 0;
+    int (*compare)(void *, void *) = 0;
     if (g_opt_reverse) {
         if (g_opt_time) {
-            compare = ft_comparedt;
+            compare = ft_comparefdt;
         }
         else {
-            compare = ft_compared;
+            compare = ft_comparefd;
         }
     }
     else if (g_opt_time) {
-        compare = ft_compareat;
+        compare = ft_comparefat;
     }
     else {
-        compare = ft_comparea;
+        compare = ft_comparefa;
     }
 
-    return (ft_qsort(arr, 0, size - 1, compare));
+    return (ft_qsort(arr, sizeof(*arr), 0, size - 1, compare));
 }
 
 

@@ -114,6 +114,9 @@ extern char *ft_utoa(uint64_t, uint8_t, char[16]);
 
 extern int ft_getwinsize(size_t *, size_t *);
 
+
+extern int ft_swap(void *, void *, size_t);
+
 /* ./ft_ls-getopt.c */
 
 extern int ft_getopt(int, char **);
@@ -125,18 +128,18 @@ extern int ft_print(struct s_file *, const size_t, int);
 
 /* ./ft_ls-sort.c */
 
-extern int ft_comparea(struct s_file, struct s_file);
+extern int ft_comparefa(void *, void *);
 
 
-extern int ft_compared(struct s_file, struct s_file);
+extern int ft_comparefd(void *, void *);
 
 
-extern int ft_compareat(struct s_file, struct s_file);
+extern int ft_comparefat(void *, void *);
 
 
-extern int ft_comparedt(struct s_file, struct s_file);
+extern int ft_comparefdt(void *, void *);
 
 
-extern struct s_file *ft_qsort(struct s_file *, const size_t, const size_t, int (*)(struct s_file, struct s_file));
+extern struct s_file *ft_qsort(struct s_file *, const size_t, const size_t, const size_t, int (*)(void *, void *));
 
 #endif /* _ft_ls_h_ */

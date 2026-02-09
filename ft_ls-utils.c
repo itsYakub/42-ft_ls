@@ -91,3 +91,16 @@ extern int ft_getwinsize(size_t *w_ptr, size_t *h_ptr) {
     }
     return (1);
 }
+
+
+extern int ft_swap(void *v0, void *v1, size_t s) {
+    uint8_t *u0 = (uint8_t *) v0;
+    uint8_t *u1 = (uint8_t *) v1;
+
+    while (s--) {
+        uint8_t tmp = u0[s];
+        u0[s] = u1[s];
+        u1[s] = tmp;
+    }
+    return (1);
+}
