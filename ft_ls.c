@@ -2,7 +2,7 @@
 
 /*  ft_ls:
  *  - [ ] leaks
- *  - [ ] error messages
+ *  - [X] error messages
  * */
 
 int main(int ac, char **av) {
@@ -72,6 +72,17 @@ int main(int ac, char **av) {
         l_dirs = ft_lstsort(l_dirs);
 
         for (t_list *list = l_dirs; list; list = list->next) {
+            const char *path = list->content;
+            size_t size = ft_dircnt(path);
+            if (!size) {
+                ft_putstr_fd(g_prog, 2);
+                ft_putstr_fd(": cannot open directory '", 2);
+                ft_putstr_fd(path, 2);
+                ft_putstr_fd("': ", 2);
+                ft_putendl_fd(strerror(errno), 2);
+                continue;
+            }
+            
             struct s_file *arr= ft_process_d(list);
             if (!arr) { 
                 ft_lstclear(&l_file, free);
@@ -79,10 +90,11 @@ int main(int ac, char **av) {
                 return (1);
             }
 
-            const char *path = list->content;
-            size_t size = ft_dircnt(path);
             size_t lstsize = ft_lstsize(l_dirs);
             if (lstsize > 1 || l_file || f_process) {
+                if (list->next) {
+                    ft_putchar_fd('\n', 1);
+                }
                 ft_putstr_fd(path, 1);
                 ft_putendl_fd(":", 1);
             }
@@ -96,9 +108,6 @@ int main(int ac, char **av) {
                 ft_print(arr, size, FILE_MODE_D);
             }
 
-            if (list->next) {
-                ft_putchar_fd('\n', 1);
-            }
             free(arr), arr = 0;
         }
     }
