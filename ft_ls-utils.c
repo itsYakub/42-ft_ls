@@ -40,6 +40,8 @@ extern size_t ft_dircnt(const char *path) {
 
 
 extern size_t ft_numlen(const size_t n, const uint8_t radix) {
+    if (!n) { return (1); }
+
     size_t n_l = 0;
     for (uint64_t tmp = n; tmp != 0; tmp /= radix) {
         n_l++;

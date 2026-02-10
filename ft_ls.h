@@ -84,6 +84,8 @@ struct s_file {
 
     dev_t f_dev;
     dev_t f_rdev;
+
+    char f_valid : 1;
 };
 
 

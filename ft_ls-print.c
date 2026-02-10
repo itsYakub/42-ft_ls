@@ -174,6 +174,7 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
     /* Total blocks and longest address...  */
     size_t blocks = 0;
     off_t sizemax = 0;
+    nlink_t nlinkmax = 0;
     for (size_t i = 0; i < size; i++) {
         struct s_file file = arr[i];
         /* validate '-a' flag... */
@@ -185,8 +186,10 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
 
         blocks += file.f_blkcnt / 2;
         sizemax = file.f_size > sizemax ? file.f_size : sizemax;
+        nlinkmax = file.f_nlink > nlinkmax ? file.f_nlink : nlinkmax;
     }
-    sizemax = ft_numlen(sizemax, 10);
+    sizemax  = ft_numlen(sizemax, 10);
+    nlinkmax = ft_numlen(nlinkmax, 10);
 
     /* Total blocks... */
     if (mode == FILE_MODE_D) {
@@ -210,6 +213,10 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
         ft_putstr_fd(buffer, 1); ft_putchar_fd(' ', 1);
 
         /* print number of links... */
+        size_t numlen = ft_numlen(file.f_nlink, 10);
+        for (size_t i = 0; i < nlinkmax - numlen; i++) {
+            ft_putchar_fd(' ', 1);
+        }
         ft_putnbr_fd(file.f_nlink, 1); ft_putchar_fd(' ', 1);
 
         /* print owner... */
@@ -221,7 +228,7 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
         ft_putstr_fd(group->gr_name, 1); ft_putchar_fd(' ', 1);
 
         /* print address... */
-        size_t numlen = ft_numlen(file.f_size, 10);
+        numlen = ft_numlen(file.f_size, 10);
         for (size_t i = 0; i < sizemax - numlen; i++) {
             ft_putchar_fd(' ', 1);
         }
@@ -281,7 +288,17 @@ static char *ft_print_date(struct s_file file, char buffer[128]) {
         return (0);
     }
 
+    time_t t_now = time(0);
+
     ft_memset(buffer, 0, 128);
-    ft_strlcpy(&buffer[0], ct + 4, 13);
+    /* time less than 6 months... */
+    if (t_now - file.f_mtime < 15778458) {
+        ft_strlcpy(&buffer[0], ct + 4, 13);
+    }
+    /* time greater than 6 months... */
+    else {
+        ft_strlcpy(&buffer[0], ct + 4, 8);
+        ft_strlcpy(&buffer[7], ct + 19, 6);
+    }
     return (buffer);
 }

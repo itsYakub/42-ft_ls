@@ -92,6 +92,11 @@ extern int ft_comparefa(void *f0, void *f1) {
     ) {
         return (1);
     }
+    else if (!ft_strcmp(n0, ".") &&
+             !ft_strcmp(n1, "..")
+    ) {
+        return (0);
+    }
 
     while (*n0 || *n1) {
         while (*n0 && !ft_isalnum(*n0)) { n0++; }
@@ -122,6 +127,11 @@ extern int ft_comparefd(void *f0, void *f1) {
         !ft_strcmp(n1, "..")
     ) {
         return (1);
+    }
+    else if (!ft_strcmp(n0, "..") &&
+             !ft_strcmp(n1, ".")
+    ) {
+        return (0);
     }
 
     while (*n0 || *n1) {
