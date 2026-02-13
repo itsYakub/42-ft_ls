@@ -9,6 +9,11 @@ static int ft_extract_from_av(t_list **, t_list **, int, char **);
 
 
 int main(int ac, char **av) {
+    
+    /* initialize states... */
+    
+    ft_getwinsize(&g_width, &g_height);
+    
     /* process command-line arguments... */
 
     int getopt = ft_getopt(ac, av);
@@ -145,6 +150,14 @@ int g_opt_reverse = 0;
 /* g_opt_time - sort entries by newest first (check: ls -t)
  * */
 int g_opt_time = 0;
+
+/* g_width - count of columns
+ * */
+size_t g_width;
+
+/* g_height - count of rows
+ * */
+size_t g_height;
 
 /* g_prog - name of the executable (av[0])
  * */

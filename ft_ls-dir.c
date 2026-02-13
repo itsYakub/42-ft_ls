@@ -13,17 +13,14 @@ static int ft_recurse(struct s_file *, const size_t, const char *, t_list **);
 extern struct s_file *ft_process_d(t_list *list) {
     if (!list) { return (0); }
 
-    size_t size = 0;
-    struct s_file *arr = 0;
-
     const char *path = list->content;
     DIR *dir = opendir(path);
     if (!dir) {
         return (0);
     }
 
-    size = ft_dircnt(path);
-    arr = ft_extract(dir, path);
+    size_t size = ft_dircnt(path);
+    struct s_file *arr = ft_extract(dir, path);
     if (!arr) {
         return (0);
     }
@@ -43,11 +40,8 @@ extern struct s_file *ft_process_d(t_list *list) {
 
 
 static struct s_file *ft_extract(DIR *dir, const char *path) {
-    size_t dircnt = 0;
-    struct s_file *arr = 0;
-        
-    dircnt = ft_dircnt(path);    
-    arr = ft_calloc(dircnt, sizeof(struct s_file));
+    size_t dircnt = ft_dircnt(path);    
+    struct s_file *arr = ft_calloc(dircnt, sizeof(struct s_file));
     if (!arr) {
         return (0);
     }

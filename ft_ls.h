@@ -31,6 +31,10 @@ extern int g_opt_reverse;
 
 extern int g_opt_time;
 
+extern size_t g_width;
+
+extern size_t g_height;
+
 extern char *g_prog;
 
 

@@ -48,7 +48,7 @@ static int ft_print_column(struct s_file *arr, const size_t size) {
 struct s_col_info {
     int line_valid;
     int line_len;
-    int *max_len;
+    int max_len[256];
 };
 
 static size_t ft_column_count(struct s_file *, const size_t, struct s_col_info *);
@@ -75,11 +75,8 @@ static int ft_print_vertical(struct s_file *arr, const size_t size) {
     } 
 
     /* allocate column info array... */
-    struct s_col_info col_info[256] = { [0 ... 255 ] = { 1, 0, 0 } };
-    for (size_t i = 0; i < 256; i++) {
-        col_info[i].max_len = ft_calloc(size_f, sizeof(int));
-    }
-
+    struct s_col_info col_info[256] = { [0 ... 255 ] = { 1, 0, { 0 } } };
+    
     size_t ncols = ft_column_count(arr_f, size_f, col_info);
     size_t nrows = ncols > 0 ? 
         (size_f + ncols - 1) / ncols : 0;
@@ -102,11 +99,7 @@ static int ft_print_vertical(struct s_file *arr, const size_t size) {
         ft_putchar_fd('\n', 1);
     }
 
-    for (size_t i = 0; i < 256; i++) {
-        free(col_info[i].max_len);
-    }
     free(arr_f);
-
     return (1);
 }
 
@@ -116,10 +109,10 @@ static size_t ft_column_count(struct s_file *arr, const size_t size, struct s_co
     if (!info) { return (0); }
 
     /* get terminal resolution... */
-    size_t width  = 0,
-           height = 0;
-    ft_getwinsize(&width, &height);
+    size_t width  = g_width,
+           height = g_height;
 
+    (void) height;
     size_t max_columns_count = width / (1 + 2); /* (1 + 2) -> 1 char name + 2 spaces */ 
     size_t max_columns = max_columns_count < size ? max_columns_count : size;
 
