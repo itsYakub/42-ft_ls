@@ -161,6 +161,9 @@ static char *ft_print_perm(struct s_file, char [16]);
 static char *ft_print_date(struct s_file, char [128]);
 
 
+static char *ft_print_link(struct s_file, char [PATH_MAX]);
+
+
 static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
     if (!arr) { return (0); }
 
@@ -235,6 +238,15 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
         /* print name... */
         ft_putstr_fd(arr[i].f_name, 1);
 
+        /* print link... */
+        if ((arr[i].f_mode & S_IFMT) == S_IFLNK) {
+            char buffer[PATH_MAX] = { 0 };
+            if (ft_print_link(file, buffer)) {
+                ft_putstr_fd(" -> ", 1);
+                ft_putstr_fd(buffer, 1);
+            }
+        }
+
         ft_putchar_fd('\n', 1);
     }
     return (1);
@@ -293,5 +305,17 @@ static char *ft_print_date(struct s_file file, char buffer[128]) {
         ft_strlcpy(&buffer[0], ct + 4, 8);
         ft_strlcpy(&buffer[7], ct + 19, 6);
     }
+    return (buffer);
+}
+
+
+static char *ft_print_link(struct s_file file, char buffer[PATH_MAX]) {
+    char subpath[PATH_MAX] = { 0 };
+    ft_create_subpath(file.f_path, file.f_name, subpath);
+
+    if (readlink(subpath, buffer, PATH_MAX) == -1) {
+        return (0);
+    }
+
     return (buffer);
 }
