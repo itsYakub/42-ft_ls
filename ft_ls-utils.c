@@ -20,6 +20,17 @@ extern int ft_strlast(const char *s0, int c) {
 }
 
 
+extern char *ft_create_subpath(const char *path, const char *file, char buffer[PATH_MAX]) {
+    ft_strlcat(buffer, path, PATH_MAX);
+    if (!ft_strlast(path, '/')) {
+        ft_strlcat(buffer, "/", PATH_MAX);
+    }
+    ft_strlcat(buffer, file, PATH_MAX);
+
+    return (buffer);
+}
+
+
 extern size_t ft_dircnt(const char *path) {
     DIR *dir = opendir(path);
     if (!dir) { return (0); }

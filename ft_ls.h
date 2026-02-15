@@ -23,7 +23,7 @@
 #
 # include "./libft/libft.h"
 
-extern int g_opt_recursive;
+extern int g_opt_recurse;
 
 extern int g_opt_all;
 
@@ -64,7 +64,8 @@ enum e_file_mode {
 
 
 struct s_file {
-    char f_name[PATH_MAX];
+    char f_name[PATH_MAX];  /* f_name - name of the file */
+    char f_path[PATH_MAX];  /* f_path - parent directory path */
 
     off_t f_size;
 
@@ -119,6 +120,9 @@ extern int ft_strcmp(const char *, const char *);
 
 
 extern int ft_strlast(const char *, int);
+
+
+extern char *ft_create_subpath(const char *, const char *, char [PATH_MAX]);
 
 
 extern size_t ft_dircnt(const char *);

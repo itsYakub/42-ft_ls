@@ -22,7 +22,7 @@ extern int ft_getopt(int ac, char **av) {
 
                 if (!ft_strcmp(opt, "all"))       { g_opt_all = 1;       }
                 if (!ft_strcmp(opt, "reverse"))   { g_opt_reverse = 1;   }
-                if (!ft_strcmp(opt, "recursive")) { g_opt_recursive = 1; }
+                if (!ft_strcmp(opt, "recurse")) { g_opt_recurse = 1; }
                 
                 else if (!ft_strcmp(opt, "help")) {
                     ft_getopt_help();
@@ -52,7 +52,7 @@ extern int ft_getopt(int ac, char **av) {
                         case ('a'): { g_opt_all = 1;       } break;
                         case ('t'): { g_opt_time = 1;      } break;
                         case ('r'): { g_opt_reverse = 1;   } break;
-                        case ('R'): { g_opt_recursive = 1; } break;
+                        case ('R'): { g_opt_recurse = 1; } break;
                         case ('C'): { g_print_mode = 1;    } break;
                         case ('l'): { g_print_mode = 2;    } break;
                         case ('1'): {
@@ -97,7 +97,7 @@ static int ft_getopt_help(void) {
     ft_putendl_fd("  -C                         list entries by columns", 1);
     ft_putendl_fd("  -l                         use a long listing format", 1);
     ft_putendl_fd("  -r, --reverse              reverse order while sorting", 1);
-    ft_putendl_fd("  -R, --recursive            list subdirectories recursively", 1);
+    ft_putendl_fd("  -R, --recurse            list subdirectories recursely", 1);
     ft_putendl_fd("  -t                         sort by time, newest first", 1);
     ft_putendl_fd("  -1                         list one file per line", 1);
     ft_putendl_fd("      --help        display this help and exit", 1);

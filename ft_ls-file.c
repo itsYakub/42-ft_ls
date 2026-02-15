@@ -36,10 +36,11 @@ static int ft_extract(struct s_file *result, const char *path) {
     if (!result) { return (0); }
     
     struct stat st = { 0 };
-    if (stat(path, &st) == -1) {
+    if (lstat(path, &st) == -1) {
         return (0);
     }
     ft_strlcat(result->f_name, path, PATH_MAX);
+    ft_memset(result->f_path, 0, PATH_MAX);
     result->f_size = st.st_size;
     result->f_mode = st.st_mode;
     result->f_mtime = st.st_mtime;

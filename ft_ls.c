@@ -1,8 +1,7 @@
 #include "./ft_ls.h"
 
 /*  ft_ls:
- *  - [ ] leaks
- *  - [X] error messages
+ *  - [ ] symlinks
  * */
 
 static int ft_extract_from_av(t_list **, t_list **, int, char **);
@@ -109,7 +108,7 @@ static int ft_extract_from_av(t_list **l_file, t_list **l_dirs, int ac, char ** 
         if (*av[i] == '-') { continue; }
 
         struct stat st = { 0 };
-        if (stat(av[i], &st) == -1) {
+        if (lstat(av[i], &st) == -1) {
             ft_putstr_fd(g_prog, 2);
             ft_putstr_fd(": cannot access '", 2);
             ft_putstr_fd(av[i], 2);
@@ -135,9 +134,9 @@ static int ft_extract_from_av(t_list **l_file, t_list **l_dirs, int ac, char ** 
     return (1);
 }
 
-/* g_opt_recursive - recursively enter to subdirectories (check: ls -R)
+/* g_opt_recurse - recursely enter to subdirectories (check: ls -R)
  * */
-int g_opt_recursive = 0;
+int g_opt_recurse = 0;
 
 /* g_opt_all - output all files and directories (including hidden) (check: ls -a)
  * */

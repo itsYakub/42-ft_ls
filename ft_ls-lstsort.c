@@ -95,11 +95,11 @@ extern int ft_compareld(void *v0, void *v1) {
 extern int ft_comparelat(void *v0, void *v1) {
     const char *n0 = (const char *) v0;
     struct stat st0 = { 0 };
-    stat(n0, &st0);
+    lstat(n0, &st0);
 
     const char *n1 = (const char *) v1;
     struct stat st1 = { 0 };
-    stat(n1, &st1);
+    lstat(n1, &st1);
     
     size_t t0 = st0.st_mtim.tv_sec;
     size_t t1 = st1.st_mtim.tv_sec;
@@ -120,11 +120,11 @@ extern int ft_comparelat(void *v0, void *v1) {
 extern int ft_compareldt(void *v0, void *v1) {
     const char *n0 = (const char *) v0;
     struct stat st0 = { 0 };
-    stat(n0, &st0);
+    lstat(n0, &st0);
 
     const char *n1 = (const char *) v1;
     struct stat st1 = { 0 };
-    stat(n1, &st1);
+    lstat(n1, &st1);
     
     size_t t0 = st0.st_mtim.tv_sec;
     size_t t1 = st1.st_mtim.tv_sec;

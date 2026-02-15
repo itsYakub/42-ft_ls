@@ -31,7 +31,7 @@ extern struct s_file *ft_process_d(t_list *list) {
         return (0);
     }
 
-    if (g_opt_recursive) {
+    if (g_opt_recurse) {
         ft_recurse(arr, size, path, &list);
     }
     
@@ -50,11 +50,7 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
     for (size_t i = 0; (dirent = readdir(dir)); i++) {
         /* create sub-path... */
         char subpath[PATH_MAX + 1] = { 0 };
-        ft_strlcat(subpath, path, PATH_MAX);
-        if (!ft_strlast(path, '/')) {
-            ft_strlcat(subpath, "/", PATH_MAX);
-        }
-        ft_strlcat(subpath, dirent->d_name, PATH_MAX);
+        ft_create_subpath(path, dirent->d_name, subpath);
 
         struct stat st = { 0 };
         if (lstat(subpath, &st) == -1) {
@@ -62,6 +58,7 @@ static struct s_file *ft_extract(DIR *dir, const char *path) {
         }
 
         ft_strlcat(arr[i].f_name, dirent->d_name, PATH_MAX);
+        ft_strlcat(arr[i].f_path, path, PATH_MAX);
         arr[i].f_size= st.st_size;
         arr[i].f_mode = st.st_mode;
         arr[i].f_mtime = st.st_mtime;
@@ -127,11 +124,7 @@ static int ft_recurse(struct s_file *arr, const size_t size, const char *path, t
 
             /* create sub-path... */
             char subpath[PATH_MAX + 1] = { 0 };
-            ft_strlcat(subpath, path, PATH_MAX);
-            if (!ft_strlast(path, '/')) {
-                ft_strlcat(subpath, "/", PATH_MAX);
-            }
-            ft_strlcat(subpath, arr[i].f_name, PATH_MAX);
+            ft_create_subpath(path, arr[i].f_name, subpath);
 
             /* add the new path entry to global paths list... */
             t_list *entry = ft_lstnew(ft_strdup(subpath));
