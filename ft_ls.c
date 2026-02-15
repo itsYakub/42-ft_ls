@@ -31,14 +31,12 @@ int main(int ac, char **av) {
     /* process files... */
 
     if (l_file) {
-        struct s_file *arr = ft_process_f(l_file);
+        size_t size = 0;
+        struct s_file *arr = ft_process_f(l_file, &size);
         if (!arr) {
             ft_lstclear(&l_dirs, free);
             return (1);
         }
-
-        size_t size = 0;
-        while (*arr[size].f_name) { size++; }
 
         ft_print(arr, size, FILE_MODE_F);
         if (l_dirs) {
@@ -54,21 +52,16 @@ int main(int ac, char **av) {
 
         for (t_list *list = l_dirs; list; list = list->next) {
             const char *path = list->content;
-            size_t size = ft_dircnt(path);
-            if (!size) {
+
+            size_t size = 0;
+            struct s_file *arr = ft_process_d(list, &size);
+            if (!arr) { 
                 ft_putstr_fd(g_prog, 2);
                 ft_putstr_fd(": cannot open directory '", 2);
                 ft_putstr_fd(path, 2);
                 ft_putstr_fd("': ", 2);
                 ft_putendl_fd(strerror(errno), 2);
                 continue;
-            }
-            
-            struct s_file *arr= ft_process_d(list);
-            if (!arr) { 
-                ft_lstclear(&l_file, free);
-                ft_lstclear(&l_dirs, free);
-                return (1);
             }
 
             size_t lstsize = ft_lstsize(l_dirs);

@@ -7,22 +7,22 @@ static int ft_extract(struct s_file *, const char *);
 static struct s_file *ft_sort(struct s_file *, const size_t);
 
 
-extern struct s_file *ft_process_f(t_list *list) {
+extern struct s_file *ft_process_f(t_list *list, size_t *size) {
     if (!list) { return (0); }
 
-    size_t size = ft_lstsize(list);
-    if (!size) { return (0); }
+    *size = ft_lstsize(list);
+    if (!*size) { return (0); }
 
-    struct s_file *arr = ft_calloc(size + 1, sizeof(struct s_file));
+    struct s_file *arr = ft_calloc(*size, sizeof(struct s_file));
     if (!arr) { return (0); }
 
-    for (size_t i = 0, j = 0; i < size; i++, list = list->next) {
+    for (size_t i = 0, j = 0; i < *size; i++, list = list->next) {
         if (ft_extract(&arr[j], list->content)) {
             j++;
         }
     }
     
-    arr = ft_sort(arr, size);
+    arr = ft_sort(arr, *size);
     if (!arr) {
         return (0);
     }

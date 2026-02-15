@@ -96,11 +96,11 @@ struct s_file {
 
 /* ./ft_ls-dir.c */
 
-extern struct s_file *ft_process_d(t_list *);
+extern struct s_file *ft_process_d(t_list *, size_t *);
 
 /* ./ft_ls-file.c */
 
-extern struct s_file *ft_process_f(t_list *);
+extern struct s_file *ft_process_f(t_list *, size_t *);
 
 
 extern int ft_comparefa(void *, void *);
