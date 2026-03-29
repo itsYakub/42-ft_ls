@@ -85,6 +85,10 @@ static int ft_print_vertical(struct s_file *arr, const size_t size) {
     for (size_t i = 0; i < nrows; i++) {
         for (size_t j = 0; j < ncols; j++) {
             size_t arr_i = j * nrows + i;
+            if (arr_i >= size_f) {
+                break;
+            }
+
             struct s_file file = arr_f[arr_i];
 
             ft_putstr_fd(file.f_name, 1);
@@ -123,7 +127,7 @@ static size_t ft_column_count(struct s_file *arr, const size_t size, struct s_co
             }
 
             size_t rows = (size + info_i) / (info_i + 1);
-            if (rows * (info_i + 1) - size > rows) {
+            if (rows * (info_i + 1) - size >= rows) {
                 info[info_i].line_valid = 0;
                 continue;
             }
@@ -164,6 +168,7 @@ static char *ft_print_date(struct s_file, char [128]);
 static char *ft_print_link(struct s_file, char [PATH_MAX]);
 
 
+/* Frogive me Lord for this piece of garbage code... */
 static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
     if (!arr) { return (0); }
 
@@ -171,6 +176,8 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
     size_t blocks = 0;
     off_t sizemax = 0;
     nlink_t nlinkmax = 0;
+    size_t passmax = 0;
+    size_t grmax = 0;
     for (size_t i = 0; i < size; i++) {
         struct s_file file = arr[i];
         /* validate '-a' flag... */
@@ -181,9 +188,25 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
         }
 
         blocks += file.f_blkcnt / 2;
+
+        /* get the longest file size... */
         sizemax = file.f_size > sizemax ? file.f_size : sizemax;
+
+        /* get the longest number of links... */
         nlinkmax = file.f_nlink > nlinkmax ? file.f_nlink : nlinkmax;
+        
+        /* get the longest owner name length... */
+        struct passwd *passwd = getpwuid(file.f_uid);
+        size_t strlen = ft_strlen(passwd->pw_name);
+        passmax = strlen >= passmax ? strlen + 1 : passmax;
+        
+        /* get the longest group name length...*/
+        struct group *group = getgrgid(file.f_gid);
+        strlen = ft_strlen(group->gr_name);
+        grmax = strlen >= grmax ? strlen + 1 : grmax;
     }
+
+    /* assign longest textual lengths... */
     sizemax  = ft_numlen(sizemax, 10);
     nlinkmax = ft_numlen(nlinkmax, 10);
 
@@ -217,11 +240,17 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
 
         /* print owner... */
         struct passwd *passwd = getpwuid(file.f_uid);
-        ft_putstr_fd(passwd->pw_name, 1); ft_putchar_fd(' ', 1);
+        ft_putstr_fd(passwd ? passwd->pw_name : "?", 1);
+        for (size_t i = 0, len = ft_strlen(passwd->pw_name); i < passmax - len; i++) {
+            ft_putchar_fd(' ', 1);
+        }
         
         /* print group... */
         struct group *group = getgrgid(file.f_gid);
-        ft_putstr_fd(group->gr_name, 1); ft_putchar_fd(' ', 1);
+        ft_putstr_fd(group ? group->gr_name : "?", 1);
+        for (size_t i = 0, len = ft_strlen(group->gr_name); i < grmax - len; i++) {
+            ft_putchar_fd(' ', 1);
+        }
 
         /* print address... */
         numlen = ft_numlen(file.f_size, 10);
@@ -254,6 +283,8 @@ static int ft_print_long(struct s_file *arr, const size_t size, int mode) {
 
 
 static char *ft_print_perm(struct s_file file, char buffer[16]) {
+    ft_memset(buffer, 0, 16);
+    
     /* file type... */
     switch (file.f_mode & S_IFMT) {
         case (S_IFDIR):  { *buffer = 'd'; } break;
@@ -281,8 +312,6 @@ static char *ft_print_perm(struct s_file file, char buffer[16]) {
     buffer[8] = file.f_mode & S_IWOTH ? 'w' : '-';
     buffer[9] = file.f_mode & S_IXOTH ? 'x' : '-';
 
-    /* null-terminator... */
-    for (size_t i = 10; i < 1; i++) { buffer[i] = 0; }
     return (buffer);
 }
 
